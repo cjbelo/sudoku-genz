@@ -7,7 +7,6 @@ const GameScreen = () => {
   const { logout, setScreen, isPaused, pauseGame, resumeGame, getCurrentBoard, setSelected, selected } = useAppStore();
 
   const board = getCurrentBoard();
-  console.log(selected);
 
   const handleGoBack = () => {
     setScreen("difficulty");
@@ -76,8 +75,8 @@ const GameScreen = () => {
                     const globalCol = boxCol * 3 + col;
                     const cell = board[globalRow][globalCol];
 
-                    const isSelected = selected.globalRow === globalRow && selected.globalCol === globalCol;
-                    const isHighlighted = selected.cell === cell && cell !== 0;
+                    const isSelected = selected?.globalRow === globalRow && selected?.globalCol === globalCol;
+                    const isHighlighted = selected?.cell === cell && cell !== 0;
 
                     return (
                       <div
@@ -87,9 +86,9 @@ const GameScreen = () => {
                             ? "bg-purple-200 text-purple-800 font-bold"
                             : isHighlighted
                             ? "bg-purple-100 text-purple-800"
-                            : (selected.boxRow === boxRow && selected.boxCol === boxCol) || // Highlight 3x3 region
-                              selected.globalRow === globalRow || // Highlight same row
-                              selected.globalCol === globalCol // Highlight same column
+                            : (selected?.boxRow === boxRow && selected?.boxCol === boxCol) || // Highlight 3x3 region
+                              selected?.globalRow === globalRow || // Highlight same row
+                              selected?.globalCol === globalCol // Highlight same column
                             ? "bg-gray-200 text-gray-800"
                             : "bg-white text-gray-800",
                         ].join(" ")}
