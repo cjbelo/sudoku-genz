@@ -1,16 +1,21 @@
 import FeatherIcon from "feather-icons-react";
 import ActionButton from "@/components/ActionButton";
 import { useAppStore } from "@/stores/appStore";
+import GameTimer from "@/components/GameTimer";
 
 const GameScreen = () => {
-  const { logout, setScreen } = useAppStore();
+  const { logout, setScreen, isPaused, pauseGame, resumeGame, getCurrentBoard, setSelected, selected } = useAppStore();
+
+  const board = getCurrentBoard();
+  console.log(selected);
 
   const handleGoBack = () => {
     setScreen("difficulty");
   };
 
-  const handleLogout = () => {
-    logout();
+  const handlePauseToggle = () => {
+    if (isPaused) resumeGame();
+    else pauseGame();
   };
 
   return (
@@ -28,10 +33,10 @@ const GameScreen = () => {
           Sudoku <span className="text-purple-600">Gen Z</span>
         </h1>
         <div className="flex space-x-2">
-          <button className="p-2 rounded-full bg-white shadow" onClick={() => setScreen("result")}>
+          <button className="p-2 rounded-full bg-white shadow cursor-pointer" onClick={() => setScreen("result")}>
             <FeatherIcon icon="refresh-cw" />
           </button>
-          <button className="p-2 rounded-full bg-white shadow" onClick={handleLogout}>
+          <button className="p-2 rounded-full bg-white shadow cursor-pointer" onClick={logout}>
             <FeatherIcon icon="log-out" />
           </button>
         </div>
@@ -44,7 +49,9 @@ const GameScreen = () => {
             style={{ width: 80 }}
           >
             <p className="text-gray-500 text-sm">Time</p>
-            <p className="font-bold">9:05:23</p>
+            <p className="font-bold">
+              <GameTimer />
+            </p>
           </div>
           <div className="flex flex-col items-center justify-center bg-white rounded-lg p-3 shadow">
             <p className="text-gray-500 text-sm">Mistakes</p>
@@ -67,9 +74,31 @@ const GameScreen = () => {
                   Array.from({ length: 3 }).map((_, col) => {
                     const globalRow = boxRow * 3 + row;
                     const globalCol = boxCol * 3 + col;
-                    const cell = `${globalRow}${globalCol}`;
-                    console.log(cell);
-                    return <div className="sudoku-cell" key={`${globalRow}-${globalCol}`}></div>;
+                    const cell = board[globalRow][globalCol];
+
+                    const isSelected = selected.globalRow === globalRow && selected.globalCol === globalCol;
+                    const isHighlighted = selected.cell === cell && cell !== 0;
+
+                    return (
+                      <div
+                        className={[
+                          "relative flex items-center justify-center cursor-default text-xl",
+                          isSelected
+                            ? "bg-purple-200 text-purple-800 font-bold"
+                            : isHighlighted
+                            ? "bg-purple-100 text-purple-800"
+                            : (selected.boxRow === boxRow && selected.boxCol === boxCol) || // Highlight 3x3 region
+                              selected.globalRow === globalRow || // Highlight same row
+                              selected.globalCol === globalCol // Highlight same column
+                            ? "bg-gray-200 text-gray-800"
+                            : "bg-white text-gray-800",
+                        ].join(" ")}
+                        key={`${globalRow}-${globalCol}`}
+                        onClick={() => setSelected({ cell, boxRow, boxCol, globalRow, globalCol })}
+                      >
+                        {cell || ""}
+                      </div>
+                    );
                   })
                 )}
               </div>
@@ -81,9 +110,12 @@ const GameScreen = () => {
           {Array.from({ length: 9 }).map((_, num) => {
             const digit = num + 1;
             return (
-              <button class="aspect-[3/4] rounded-lg bg-purple-100 hover:bg-purple-200 transition flex flex-col items-center justify-center cursor-pointer">
-                <span className="font-bold text-lg text-purple-800">{digit}</span>
-                <span className="text-xs leading-none text-purple-500">9</span>
+              <button
+                key={`${digit}-button`}
+                className="aspect-[3/4] rounded-lg bg-purple-100 hover:bg-purple-200 transition flex flex-col items-center justify-center cursor-pointer relative"
+              >
+                <span className="font-bold text-xl text-purple-800 mt-1">{digit}</span>
+                <span className="text-xs leading-none text-purple-500 absolute z-1 top-[5px] right-[5px]">9</span>
               </button>
             );
           })}
@@ -96,7 +128,12 @@ const GameScreen = () => {
 
         <div className="flex space-x-4 w-full max-w-md">
           <ActionButton icon="info" label="Hint" className="bg-purple-600 hover:bg-purple-700 font-bold text-white" />
-          <ActionButton icon="pause-circle" label="Pause" className="bg-white hover:bg-gray-100 font-bold" />
+          <ActionButton
+            icon={isPaused ? "play" : "pause-circle"}
+            label={isPaused ? "Continue" : "Pause"}
+            className="bg-white hover:bg-gray-100 font-bold"
+            onClick={handlePauseToggle}
+          />
         </div>
       </div>
     </>
