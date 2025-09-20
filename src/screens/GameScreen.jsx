@@ -2,11 +2,20 @@ import FeatherIcon from "feather-icons-react";
 import ActionButton from "@/components/ActionButton";
 import { useAppStore } from "@/stores/appStore";
 import GameTimer from "@/components/GameTimer";
+import { useMemo } from "react";
 
 const GameScreen = () => {
   const { logout, setScreen, isPaused, pauseGame, resumeGame, getCurrentBoard, setSelected, selected } = useAppStore();
 
   const board = getCurrentBoard();
+
+  const remainingCounts = useMemo(() => {
+    const freq = Array(10).fill(0); // index 1–9
+    board.flat().forEach((v) => {
+      if (v >= 1 && v <= 9) freq[v] += 1;
+    });
+    return Array.from({ length: 9 }, (_, i) => Math.max(0, 9 - freq[i + 1]));
+  }, [board]);
 
   const handleGoBack = () => {
     setScreen("difficulty");
@@ -106,15 +115,31 @@ const GameScreen = () => {
         </div>
 
         <div className="w-full max-w-md my-4 grid grid-cols-9 gap-1">
-          {Array.from({ length: 9 }).map((_, num) => {
-            const digit = num + 1;
+          {Array.from({ length: 9 }).map((_, idx) => {
+            const digit = idx + 1;
+            const left = remainingCounts[idx];
+
             return (
               <button
                 key={`${digit}-button`}
-                className="aspect-[3/4] rounded-lg bg-purple-100 hover:bg-purple-200 transition flex flex-col items-center justify-center cursor-pointer relative"
+                className={[
+                  "aspect-[3/4] rounded-lg hover:bg-purple-200 transition flex flex-col items-center justify-center relative",
+                  left === 0 ? "bg-gray-200 pointer-events-none" : "bg-purple-100 cursor-pointer",
+                ].join(" ")}
               >
-                <span className="font-bold text-xl text-purple-800 mt-1">{digit}</span>
-                <span className="text-xs leading-none text-purple-500 absolute z-1 top-[5px] right-[5px]">9</span>
+                <span
+                  className={["font-bold text-xl mt-1", left === 0 ? "text-gray-500" : "text-purple-800"].join(" ")}
+                >
+                  {digit}
+                </span>
+                <span
+                  className={[
+                    "text-xs leading-none absolute z-1 top-[5px] right-[5px]",
+                    left === 0 ? "text-gray-500" : "text-purple-400",
+                  ].join(" ")}
+                >
+                  {left}
+                </span>
               </button>
             );
           })}
