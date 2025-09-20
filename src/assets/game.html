@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sudoku | Game</title>
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <style>
+      .sudoku-board {
+        display: grid;
+        grid-template-columns: repeat(9, 1fr);
+        gap: 1px;
+        background: #333;
+        border: 2px solid #333;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      .cell {
+        aspect-ratio: 1/1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: white;
+        font-size: 1.5rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .cell:hover {
+        background: #f0f0f0;
+      }
+      .cell.selected {
+        background: #dbeafe;
+      }
+      .cell.fixed {
+        background: #f3f4f6;
+        color: #111;
+      }
+      .cell.user-input {
+        color: #3b82f6;
+      }
+      .cell.error {
+        color: #ef4444;
+      }
+      .border-right {
+        border-right: 2px solid #333;
+      }
+      .border-bottom {
+        border-bottom: 2px solid #333;
+      }
+      .number-btn {
+        transition: all 0.2s;
+      }
+      .number-btn:hover {
+        transform: scale(1.1);
+      }
+      .number-btn:active {
+        transform: scale(0.95);
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50 min-h-screen flex flex-col p-4">
+    <header class="flex justify-between items-center mb-4">
+      <button class="p-2 rounded-full bg-white shadow">
+        <i data-feather="arrow-left"></i>
+      </button>
+      <h1 class="text-xl font-bold text-gray-800">Sudoku</h1>
+      <div class="flex space-x-2">
+        <button class="p-2 rounded-full bg-white shadow">
+          <i data-feather="refresh-cw"></i>
+        </button>
+        <button class="p-2 rounded-full bg-white shadow">
+          <i data-feather="settings"></i>
+        </button>
+      </div>
+    </header>
+
+    <div class="flex-1 flex flex-col items-center justify-center">
+      <div class="mb-4 flex justify-between w-full max-w-md">
+        <div class="bg-white rounded-lg p-3 shadow">
+          <p class="text-gray-500 text-sm">Time</p>
+          <p class="font-bold">05:23</p>
+        </div>
+        <div class="bg-white rounded-lg p-3 shadow">
+          <p class="text-gray-500 text-sm">Mistakes</p>
+          <p class="font-bold">0/3</p>
+        </div>
+        <div class="bg-white rounded-lg p-3 shadow">
+          <p class="text-gray-500 text-sm">Hints</p>
+          <p class="font-bold">3</p>
+        </div>
+      </div>
+
+      <div class="sudoku-board w-full max-w-md mb-6">
+        <!-- This is a simplified representation of a Sudoku board -->
+        <!-- In a real app, this would be generated dynamically -->
+        <div class="cell fixed border-right border-bottom">5</div>
+        <div class="cell border-bottom"></div>
+        <div class="cell border-right border-bottom"></div>
+        <div class="cell border-bottom">2</div>
+        <div class="cell border-right border-bottom"></div>
+        <div class="cell border-bottom">7</div>
+        <div class="cell border-right border-bottom"></div>
+        <div class="cell border-bottom"></div>
+        <div class="cell border-bottom">9</div>
+
+        <div class="cell border-right"></div>
+        <div class="cell"></div>
+        <div class="cell border-right">8</div>
+        <div class="cell"></div>
+        <div class="cell border-right"></div>
+        <div class="cell"></div>
+        <div class="cell border-right">6</div>
+        <div class="cell"></div>
+        <div class="cell">3</div>
+
+        <div class="cell border-right border-bottom"></div>
+        <div class="cell border-bottom">7</div>
+        <div class="cell border-right border-bottom"></div>
+        <div class="cell border-bottom"></div>
+        <div class="cell border-right border-bottom"></div>
+        <div class="cell border-bottom"></div>
+        <div class="cell border-right border-bottom"></div>
+        <div class="cell border-bottom">1</div>
+        <div class="cell border-bottom"></div>
+
+        <div class="cell border-right border-bottom">8</div>
+        <div class="cell border-bottom"></div>
+        <div class="cell border-right border-bottom"></div>
+        <div class="cell border-bottom"></div>
+        <div class="cell border-right border-bottom">4</div>
+        <div class="cell border-bottom"></div>
+        <div class="cell border-right border-bottom"></div>
+        <div class="cell border-bottom"></div>
+        <div class="cell border-bottom">5</div>
+
+        <div class="cell border-right"></div>
+        <div class="cell"></div>
+        <div class="cell border-right"></div>
+        <div class="cell"></div>
+        <div class="cell border-right"></div>
+        <div class="cell"></div>
+        <div class="cell border-right"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+
+        <div class="cell border-right border-bottom">4</div>
+        <div class="cell border-bottom"></div>
+        <div class="cell border-right border-bottom"></div>
+        <div class="cell border-bottom"></div>
+        <div class="cell border-right border-bottom">2</div>
+        <div class="cell border-bottom"></div>
+        <div class="cell border-right border-bottom"></div>
+        <div class="cell border-bottom"></div>
+        <div class="cell border-bottom">6</div>
+
+        <div class="cell border-right border-bottom"></div>
+        <div class="cell border-bottom">5</div>
+        <div class="cell border-right border-bottom"></div>
+        <div class="cell border-bottom"></div>
+        <div class="cell border-right border-bottom"></div>
+        <div class="cell border-bottom"></div>
+        <div class="cell border-right border-bottom"></div>
+        <div class="cell border-bottom">3</div>
+        <div class="cell border-bottom"></div>
+
+        <div class="cell border-right">2</div>
+        <div class="cell"></div>
+        <div class="cell border-right">7</div>
+        <div class="cell"></div>
+        <div class="cell border-right"></div>
+        <div class="cell"></div>
+        <div class="cell border-right">9</div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+
+        <div class="cell border-right border-bottom">6</div>
+        <div class="cell border-bottom"></div>
+        <div class="cell border-right border-bottom"></div>
+        <div class="cell border-bottom">1</div>
+        <div class="cell border-right border-bottom"></div>
+        <div class="cell border-bottom">8</div>
+        <div class="cell border-right border-bottom"></div>
+        <div class="cell border-bottom"></div>
+        <div class="cell border-bottom fixed">7</div>
+      </div>
+
+      <div class="grid grid-cols-5 gap-2 w-full max-w-md mb-4">
+        <button class="number-btn bg-white rounded-lg p-3 shadow text-xl font-bold">1</button>
+        <button class="number-btn bg-white rounded-lg p-3 shadow text-xl font-bold">2</button>
+        <button class="number-btn bg-white rounded-lg p-3 shadow text-xl font-bold">3</button>
+        <button class="number-btn bg-white rounded-lg p-3 shadow text-xl font-bold">4</button>
+        <button class="number-btn bg-white rounded-lg p-3 shadow text-xl font-bold">5</button>
+        <button class="number-btn bg-white rounded-lg p-3 shadow text-xl font-bold">6</button>
+        <button class="number-btn bg-white rounded-lg p-3 shadow text-xl font-bold">7</button>
+        <button class="number-btn bg-white rounded-lg p-3 shadow text-xl font-bold">8</button>
+        <button class="number-btn bg-white rounded-lg p-3 shadow text-xl font-bold">9</button>
+        <button class="number-btn bg-gray-200 rounded-lg p-3 shadow col-span-3 flex items-center justify-center">
+          <i data-feather="edit" class="mr-2"></i> Notes
+        </button>
+        <button class="number-btn bg-gray-200 rounded-lg p-3 shadow">
+          <i data-feather="delete"></i>
+        </button>
+      </div>
+
+      <div class="flex space-x-4 w-full max-w-md">
+        <button
+          class="flex-1 bg-purple-600 text-white rounded-lg py-3 font-bold shadow-lg hover:bg-purple-700 transition"
+        >
+          Hint
+        </button>
+        <button class="flex-1 bg-white rounded-lg py-3 font-bold shadow-lg hover:bg-gray-100 transition">Pause</button>
+      </div>
+    </div>
+
+    <script>
+      AOS.init();
+    </script>
+    <script>
+      feather.replace();
+    </script>
+  </body>
+</html>
