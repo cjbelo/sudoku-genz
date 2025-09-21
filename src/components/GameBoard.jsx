@@ -36,7 +36,7 @@ const GameBoard = () => {
 
                 const className = cn(
                   "relative flex items-center justify-center text-xl aspect-square select-none",
-                  clue ? "font-semibold text-gray-900" : "cursor-pointer",
+                  clue ? "font-semibold text-gray-700" : "cursor-pointer",
                   // Invalid trumps other highlights
                   isInvalid
                     ? isSelected
@@ -47,8 +47,8 @@ const GameBoard = () => {
                     : isSameDigit
                     ? "bg-purple-100 text-purple-800"
                     : sameRow || sameCol || sameBox
-                    ? "bg-gray-200 text-gray-800"
-                    : "bg-white text-gray-800"
+                    ? "bg-gray-200 text-gray-700"
+                    : "bg-white text-gray-700"
                 );
 
                 return (
