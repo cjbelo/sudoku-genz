@@ -13,6 +13,7 @@ export const useAppStore = create(
       currentUser: null, // "guest" or username
       screen: "login", // "login" | "difficulty" | "game" | "result"
       difficulty: "easy",
+      isLogout: false,
 
       solvedStr: null, // 81 chars
       puzzleStr: null, // 81 chars (0 = empty)
@@ -48,6 +49,10 @@ export const useAppStore = create(
           set({ currentUser: username, screen: "difficulty", stats });
         }
       },
+
+      setIsLogout: () => set({ isLogout: true }),
+      clearIsLogout: () => set({ isLogout: false }),
+
       logout: () =>
         set({
           currentUser: null,
@@ -67,6 +72,7 @@ export const useAppStore = create(
           hints: 3,
           isGameOver: false,
           gameOverReason: null,
+          isLogout: false,
         }),
 
       // --- Nav & game lifecycle ---

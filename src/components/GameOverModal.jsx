@@ -8,22 +8,28 @@ const GameOverModal = () => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="w-full max-w-md mx-4 bg-white rounded-xl p-4 w-80 shadow-xl">
-        <h2 className="text-xl font-bold mb-2">Game Over</h2>
-        <p className="text-gray-600 mb-6">
-          {gameOverReason === "mistakes" ? "You reached the maximum mistakes." : "Game ended."}
-        </p>
-        <div className="grid grid-cols-2 gap-3">
-          <ActionButton
-            label="Restart"
-            className="bg-purple-600 hover:bg-purple-700 font-semibold text-white"
-            onClick={restartSameDifficulty}
-          />
-          <ActionButton
-            label="Select Difficulty"
-            className="bg-gray-100 hover:bg-gray-200 font-semibold"
-            onClick={() => setScreen("difficulty")}
-          />
+      <div class="modal-content bg-white rounded-2xl shadow-xl overflow-hidden w-full max-w-md mx-4">
+        <div class="bg-gradient-to-r from-red-500 to-rose-400 p-6 text-white text-center">
+          <h2 class="text-2xl font-bold">Game Over</h2>
+          <p class="opacity-90">
+            {gameOverReason === "mistakes" ? "You reached the maximum mistakes." : "Game ended."}
+          </p>
+        </div>
+        <div class="p-6">
+          <div class="flex flex-col space-y-4">
+            <ActionButton
+              label="Restart"
+              icon="refresh-cw"
+              className="bg-purple-600 hover:bg-purple-700 text-white"
+              onClick={restartSameDifficulty}
+            />
+            <ActionButton
+              label="Select Difficulty"
+              icon="chevron-down"
+              className="bg-gray-200 hover:bg-gray-300"
+              onClick={() => setScreen("difficulty")}
+            />
+          </div>
         </div>
       </div>
     </div>

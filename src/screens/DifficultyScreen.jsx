@@ -3,12 +3,12 @@ import { useAppStore } from "@/stores/appStore";
 import LevelButtons from "@/components/LevelButtons";
 
 const DifficultyScreen = () => {
-  const { currentUser, logout } = useAppStore();
+  const { currentUser, setIsLogout } = useAppStore();
   return (
     <>
       <header className="flex justify-end items-center gap-3 w-full mb-4">
         <span className="text-purple-800">Hello, {currentUser}</span>
-        <button className="p-2 rounded-full bg-white shadow cursor-pointer" onClick={logout}>
+        <button className="p-2 rounded-full bg-white shadow cursor-pointer" onClick={setIsLogout}>
           <FeatherIcon icon="log-out" />
         </button>
       </header>

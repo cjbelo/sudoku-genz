@@ -14,10 +14,10 @@ const GameScreen = () => {
     isGameOver,
     isPaused,
     invalidIdxs,
-    logout,
     pauseGame,
     resumeGame,
     selected,
+    setIsLogout,
     setCell,
     setScreen,
     useHint,
@@ -27,6 +27,7 @@ const GameScreen = () => {
   const puzzle = getPuzzleBoard();
 
   const invalidSet = useMemo(() => new Set(invalidIdxs), [invalidIdxs]);
+
   const remainingCounts = useMemo(() => {
     if (!current) return Array(9).fill(9);
     const freq = Array(10).fill(0); // count for digits 1..9
@@ -60,7 +61,7 @@ const GameScreen = () => {
 
   return (
     <>
-      <header className="w-full max-w-md flex justify-between items-center mb-4">
+      <header className="w-full flex justify-between items-center mb-4">
         <div className="flex space-x-2">
           <button className="p-2 rounded-full bg-white shadow cursor-pointer" onClick={handleGoBack}>
             <FeatherIcon icon="arrow-left" />
@@ -76,7 +77,7 @@ const GameScreen = () => {
           <button className="p-2 rounded-full bg-white shadow cursor-pointer" onClick={() => setScreen("result")}>
             <FeatherIcon icon="refresh-cw" />
           </button>
-          <button className="p-2 rounded-full bg-white shadow cursor-pointer" onClick={logout}>
+          <button className="p-2 rounded-full bg-white shadow cursor-pointer" onClick={setIsLogout}>
             <FeatherIcon icon="log-out" />
           </button>
         </div>

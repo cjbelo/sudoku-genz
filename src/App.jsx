@@ -3,6 +3,7 @@ import DifficultyScreen from "@/screens/DifficultyScreen";
 import GameScreen from "@/screens/GameScreen";
 import LoginScreen from "@/screens/LoginScreen";
 import ResultScreen from "@/screens/ResultScreen";
+import LogoutModal from "@/components/LogoutModal";
 
 const App = () => {
   const { screen } = useAppStore();
@@ -25,9 +26,12 @@ const App = () => {
   }
 
   return (
-    <div className="text-gray-800 antialiased">
-      <div className="app-container bg-gray-50 flex flex-col items-center justify-center p-4">{content}</div>
-    </div>
+    <>
+      <div className="text-gray-800 antialiased">
+        <div className="app-container bg-gray-50 flex flex-col items-center justify-center p-4">{content}</div>
+      </div>
+      <LogoutModal />
+    </>
   );
 };
 
