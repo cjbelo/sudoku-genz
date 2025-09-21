@@ -4,18 +4,35 @@ import { useAppStore } from "@/stores/appStore";
 import GameTimer from "@/components/GameTimer";
 import { useMemo } from "react";
 
-const GameScreen = () => {
-  const { logout, setScreen, isPaused, pauseGame, resumeGame, getCurrentBoard, setSelected, selected } = useAppStore();
+const cn = (...xs) => xs.filter(Boolean).join(" ");
 
-  const board = getCurrentBoard();
+const GameScreen = () => {
+  const {
+    getCurrentBoard,
+    getPuzzleBoard,
+    invalidIdxs,
+    isPaused,
+    logout,
+    pauseGame,
+    resumeGame,
+    selected,
+    setCell,
+    setScreen,
+    setSelectedCell,
+  } = useAppStore();
+
+  const current = getCurrentBoard();
+  const puzzle = getPuzzleBoard();
+
+  console.log("invalidIdxs", invalidIdxs);
 
   const remainingCounts = useMemo(() => {
     const freq = Array(10).fill(0); // index 1–9
-    board.flat().forEach((v) => {
+    current.flat().forEach((v) => {
       if (v >= 1 && v <= 9) freq[v] += 1;
     });
     return Array.from({ length: 9 }, (_, i) => Math.max(0, 9 - freq[i + 1]));
-  }, [board]);
+  }, [current]);
 
   const handleGoBack = () => {
     setScreen("difficulty");
@@ -25,6 +42,8 @@ const GameScreen = () => {
     if (isPaused) resumeGame();
     else pauseGame();
   };
+
+  if (!current || !puzzle) return null;
 
   return (
     <>
@@ -77,34 +96,54 @@ const GameScreen = () => {
         <div className="sudoku-board w-full max-w-md">
           {Array.from({ length: 3 }).map((_, boxRow) =>
             Array.from({ length: 3 }).map((_, boxCol) => (
-              <div className="sudoku-box" key={`${boxRow}-${boxCol}`}>
-                {Array.from({ length: 3 }).map((_, row) =>
-                  Array.from({ length: 3 }).map((_, col) => {
-                    const globalRow = boxRow * 3 + row;
-                    const globalCol = boxCol * 3 + col;
-                    const cell = board[globalRow][globalCol];
+              <div className="grid grid-cols-3 grid-rows-3 gap-[1px] bg-gray-500" key={`${boxRow}-${boxCol}`}>
+                {Array.from({ length: 3 }).map((_, r) =>
+                  Array.from({ length: 3 }).map((_, c) => {
+                    const row = boxRow * 3 + r;
+                    const col = boxCol * 3 + c;
+                    const digit = current[row][col];
+                    const clue = puzzle[row][col] !== 0;
+                    const index = row * 9 + col;
 
-                    const isSelected = selected?.globalRow === globalRow && selected?.globalCol === globalCol;
-                    const isHighlighted = selected?.cell === cell && cell !== 0;
+                    const isSelected = selected?.row === row && selected?.col === col;
+                    const sameRow = selected?.row === row;
+                    const sameCol = selected?.col === col;
+                    const sameBox = selected?.boxRow === boxRow && selected?.boxCol === boxCol;
+
+                    // Only non-clue, non-zero entries can be invalid
+                    const isInvalid = !clue && digit !== 0 && invalidIdxs.includes(index);
+
+                    // Same-digit highlight (optional) — keep but let invalid win
+                    const isSameDigit = !isInvalid && digit !== 0 && selected?.digit === digit;
+
+                    const className = cn(
+                      "relative flex items-center justify-center text-xl aspect-square select-none",
+                      clue ? "font-semibold text-gray-900" : "cursor-pointer",
+                      // Invalid trumps other highlights
+                      isInvalid
+                        ? isSelected
+                          ? "bg-rose-200 text-rose-800 font-bold"
+                          : "bg-rose-100 text-rose-600"
+                        : isSelected
+                        ? "bg-purple-200 text-purple-800 font-bold"
+                        : isSameDigit
+                        ? "bg-purple-100 text-purple-800"
+                        : sameRow || sameCol || sameBox
+                        ? "bg-gray-200 text-gray-800"
+                        : "bg-white text-gray-800"
+                    );
 
                     return (
                       <div
-                        className={[
-                          "relative flex items-center justify-center cursor-default text-xl",
-                          isSelected
-                            ? "bg-purple-200 text-purple-800 font-bold"
-                            : isHighlighted
-                            ? "bg-purple-100 text-purple-800"
-                            : (selected?.boxRow === boxRow && selected?.boxCol === boxCol) || // Highlight 3x3 region
-                              selected?.globalRow === globalRow || // Highlight same row
-                              selected?.globalCol === globalCol // Highlight same column
-                            ? "bg-gray-200 text-gray-800"
-                            : "bg-white text-gray-800",
-                        ].join(" ")}
-                        key={`${globalRow}-${globalCol}`}
-                        onClick={() => setSelected({ cell, boxRow, boxCol, globalRow, globalCol })}
+                        key={`${row}-${col}`}
+                        className={className}
+                        data-index={index}
+                        onClick={() => setSelectedCell(row, col)}
+                        aria-label={`r${row + 1}c${col + 1} ${clue ? "given" : "editable"} ${
+                          isInvalid ? "invalid" : ""
+                        }`}
                       >
-                        {cell || ""}
+                        {digit || ""}
                       </div>
                     );
                   })
@@ -126,6 +165,7 @@ const GameScreen = () => {
                   "aspect-[3/4] rounded-lg hover:bg-purple-200 transition flex flex-col items-center justify-center relative",
                   left === 0 ? "bg-gray-200 pointer-events-none" : "bg-purple-100 cursor-pointer",
                 ].join(" ")}
+                onClick={() => setCell(selected?.row, selected?.col, digit)}
               >
                 <span
                   className={["font-bold text-xl mt-1", left === 0 ? "text-gray-500" : "text-purple-800"].join(" ")}
@@ -145,12 +185,14 @@ const GameScreen = () => {
           })}
         </div>
 
-        <div className="flex space-x-4 w-full max-w-md mb-4">
+        <div className="grid grid-cols-2 gap-3 w-full max-w-md mb-4">
           <ActionButton icon="edit" label="Notes" className="bg-gray-200 hover:bg-gray-300" />
-          <ActionButton icon="delete" label="Erase" className="bg-gray-200 hover:bg-gray-300" />
-        </div>
-
-        <div className="flex space-x-4 w-full max-w-md">
+          <ActionButton
+            icon="delete"
+            label="Erase"
+            className="bg-gray-200 hover:bg-gray-300"
+            onClick={() => setCell(selected?.row, selected?.col, 0)}
+          />
           <ActionButton icon="info" label="Hint" className="bg-purple-600 hover:bg-purple-700 font-bold text-white" />
           <ActionButton
             icon={isPaused ? "play" : "pause-circle"}
@@ -159,6 +201,8 @@ const GameScreen = () => {
             onClick={handlePauseToggle}
           />
         </div>
+
+        <div className="flex space-x-4 w-full max-w-md"></div>
       </div>
     </>
   );

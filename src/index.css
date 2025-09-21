@@ -6,11 +6,22 @@
 @import "@fontsource/poppins/600.css";
 @import "@fontsource/poppins/700.css";
 
+html,
+body {
+  height: 100%;
+}
 body {
   font-family: "Poppins", sans-serif;
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  width: 100%;
 }
 .app-container {
-  min-height: 100dvh;
+  height: 100dvh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
 }
 .sudoku-board {
   display: grid;
@@ -24,22 +35,6 @@ body {
   background-color: var(--color-gray-800);
   gap: 2px;
   box-sizing: border-box;
-}
-.sudoku-box {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(3, 1fr);
-  background-color: var(--color-gray-500);
-  gap: 1px;
-}
-.sudoku-cell {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: default;
-  background-color: white;
-  color: var(--color-gray-800);
 }
 .sudoku-note-box {
   position: absolute;

@@ -4,6 +4,9 @@ import { boardToStr, strToBoard, setCellStr, getCellStr } from "@/utils/sudokuCo
 import { generateSolvedBoard } from "@/utils/generateSolvedBoard";
 import { generatePuzzleBoard } from "@/utils/generatePuzzleBoard";
 
+const idx = (r, c) => r * 9 + c;
+const boxRC = (r, c) => ({ boxRow: Math.floor(r / 3), boxCol: Math.floor(c / 3) });
+
 export const useAppStore = create(
   persist(
     (set, get) => ({
@@ -15,6 +18,7 @@ export const useAppStore = create(
       puzzleStr: null, // 81 chars (0 = empty)
       currentStr: null, // 81 chars (player progress)
       selected: null,
+      invalidIdxs: [], // indexes (0-80) of incorrect cells in currentStr
 
       // Persisted per-username stats
       userStats: {},
@@ -44,6 +48,7 @@ export const useAppStore = create(
           stats: {},
           startTime: null,
           elapsedMs: 0,
+          invalidIdxs: [],
           isGameRunning: false,
           isPaused: false,
           solvedStr: null,
@@ -69,8 +74,10 @@ export const useAppStore = create(
           screen: "game",
           startTime: Date.now(),
           elapsedMs: 0,
+          invalidIdxs: [],
           isGameRunning: true,
           isPaused: false,
+          selected: null,
         });
       },
 
@@ -89,6 +96,73 @@ export const useAppStore = create(
       },
 
       setSelected: (selected) => set({ selected }),
+
+      // --- Selection / Highlight ---
+      setSelectedCell: (row, col) => {
+        const { currentStr, puzzleStr } = get();
+        if (!currentStr) return set({ selected: null });
+        const digit = getCellStr(currentStr, row, col);
+        const { boxRow, boxCol } = boxRC(row, col);
+        const isClue = puzzleStr ? getCellStr(puzzleStr, row, col) !== 0 : false;
+        set({
+          selected: {
+            row,
+            col,
+            index: idx(row, col),
+            digit,
+            boxRow,
+            boxCol,
+            isClue,
+          },
+        });
+      },
+
+      // --- Board edits ---
+      // Only allow edits on cells that are not original clues (puzzleStr has 0)
+      setCell: (row, col, val /* 0-9 */) => {
+        const { puzzleStr, currentStr, solvedStr, invalidIdxs, selected } = get();
+        if (!currentStr || !puzzleStr || !solvedStr) return;
+
+        // lock given numbers
+        if (getCellStr(puzzleStr, row, col) !== 0) return;
+
+        const i = idx(row, col);
+        const nextStr = setCellStr(currentStr, row, col, val);
+
+        const solvedDigit = getCellStr(solvedStr, row, col);
+        let nextInvalid = invalidIdxs;
+
+        if (val === 0 || val === solvedDigit) {
+          // correct or cleared -> remove from invalid
+          if (nextInvalid.includes(i)) nextInvalid = nextInvalid.filter((k) => k !== i);
+        } else {
+          // wrong -> add to invalid if not already there
+          if (!nextInvalid.includes(i)) nextInvalid = [...nextInvalid, i];
+        }
+
+        set({ currentStr: nextStr, invalidIdxs: nextInvalid });
+
+        // keep selected.digit in sync if this cell is selected
+        if (selected && selected.row === row && selected.col === col) {
+          set({ selected: { ...selected, digit: val } });
+        }
+      },
+
+      // Utility to recompute all invalids at once (e.g., after load/rehydrate)
+      recomputeInvalids: () => {
+        const { currentStr, solvedStr, puzzleStr } = get();
+        if (!currentStr || !solvedStr || !puzzleStr) return set({ invalidIdxs: [] });
+
+        const out = [];
+        for (let r = 0; r < 9; r++) {
+          for (let c = 0; c < 9; c++) {
+            if (getCellStr(puzzleStr, r, c) !== 0) continue; // skip clues
+            const v = getCellStr(currentStr, r, c);
+            if (v !== 0 && v !== getCellStr(solvedStr, r, c)) out.push(idx(r, c));
+          }
+        }
+        set({ invalidIdxs: out });
+      },
 
       pauseGame: () => {
         const { isGameRunning, isPaused, startTime, elapsedMs } = get();
