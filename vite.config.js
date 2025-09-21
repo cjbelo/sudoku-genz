@@ -21,7 +21,7 @@ export default defineConfig({
       name: "Sudoku Gen Z",
       short_name: "Sudoku Gen Z",
       description: "Play the classic puzzle game with a modern twist",
-      theme_color: "#9810fa",
+      theme_color: "#fbf9fa",
       background_color: "#fbf9fa",
       display: "standalone",
       scope: "/",

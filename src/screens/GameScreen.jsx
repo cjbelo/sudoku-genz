@@ -24,8 +24,6 @@ const GameScreen = () => {
   const current = getCurrentBoard();
   const puzzle = getPuzzleBoard();
 
-  console.log("invalidIdxs", invalidIdxs);
-
   const remainingCounts = useMemo(() => {
     const freq = Array(10).fill(0); // index 1–9
     current.flat().forEach((v) => {
