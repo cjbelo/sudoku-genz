@@ -11,7 +11,7 @@ const GameBoard = () => {
   const cn = (...classes) => classes.filter(Boolean).join(" ");
 
   return (
-    <div className="sudoku-board w-full max-w-md">
+    <div className="sudoku-board w-full max-w-md grid grid-cols-3 grid-rows-3 gap-[2px] bg-gray-800">
       {Array.from({ length: 3 }).map((_, boxRow) =>
         Array.from({ length: 3 }).map((_, boxCol) => (
           <div className="grid grid-cols-3 grid-rows-3 gap-[1px] bg-gray-500" key={`${boxRow}-${boxCol}`}>

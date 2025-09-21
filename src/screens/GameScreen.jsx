@@ -60,7 +60,7 @@ const GameScreen = () => {
 
   return (
     <>
-      <header className="flex justify-between items-center w-full mb-4">
+      <header className="w-full max-w-md flex justify-between items-center mb-4">
         <div className="flex space-x-2">
           <button className="p-2 rounded-full bg-white shadow cursor-pointer" onClick={handleGoBack}>
             <FeatherIcon icon="arrow-left" />
@@ -82,7 +82,7 @@ const GameScreen = () => {
         </div>
       </header>
 
-      <div className="flex-1 flex flex-col items-center justify-center">
+      <div className="w-full max-w-md flex-1 flex flex-col items-center justify-center">
         <Counters />
         <GameBoard />
 

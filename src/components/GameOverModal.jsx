@@ -8,7 +8,7 @@ const GameOverModal = () => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="w-md bg-white rounded-xl p-4 w-80 shadow-xl">
+      <div className="w-full max-w-md mx-4 bg-white rounded-xl p-4 w-80 shadow-xl">
         <h2 className="text-xl font-bold mb-2">Game Over</h2>
         <p className="text-gray-600 mb-6">
           {gameOverReason === "mistakes" ? "You reached the maximum mistakes." : "Game ended."}

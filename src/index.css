@@ -24,16 +24,9 @@ body {
   overscroll-behavior-y: contain;
 }
 .sudoku-board {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(3, 1fr);
-  width: clamp(300px, 90vw, 448px);
-  height: clamp(300px, 90vw, 448px);
   border-width: 2px;
   border-style: solid;
   border-color: var(--color-gray-800);
-  background-color: var(--color-gray-800);
-  gap: 2px;
   box-sizing: border-box;
 }
 .sudoku-note-box {
