@@ -32,6 +32,13 @@ export const useAppStore = create(
       isGameRunning: false,
       isPaused: false,
 
+      // --- Counters & state ---
+      mistakeLimit: 3,
+      mistakes: 0,
+      hints: 3,
+      isGameOver: false,
+      gameOverReason: null, // "mistakes" | null
+
       // --- Auth ---
       login: (username) => {
         if (username === "guest") {
@@ -55,6 +62,11 @@ export const useAppStore = create(
           puzzleStr: null,
           currentStr: null,
           selected: null,
+          invalidIdxs: [],
+          mistakes: 0,
+          hints: 3,
+          isGameOver: false,
+          gameOverReason: null,
         }),
 
       // --- Nav & game lifecycle ---
@@ -78,7 +90,18 @@ export const useAppStore = create(
           isGameRunning: true,
           isPaused: false,
           selected: null,
+
+          // counters fresh
+          mistakes: 0,
+          hints: 3,
+          isGameOver: false,
+          gameOverReason: null,
         });
+      },
+
+      restartSameDifficulty: () => {
+        const { difficulty } = get();
+        get().setGameStart(difficulty);
       },
 
       // Derived getters for UI
@@ -117,32 +140,100 @@ export const useAppStore = create(
         });
       },
 
-      // --- Board edits ---
-      // Only allow edits on cells that are not original clues (puzzleStr has 0)
-      setCell: (row, col, val /* 0-9 */) => {
-        const { puzzleStr, currentStr, solvedStr, invalidIdxs, selected } = get();
-        if (!currentStr || !puzzleStr || !solvedStr) return;
+      // --- Hints ---
+      useHint: () => {
+        const { hints, solvedStr, puzzleStr, currentStr, selected } = get();
+        if (!hints || !solvedStr || !puzzleStr || !currentStr) return;
 
-        // lock given numbers
+        // Pick target: selected editable cell that is wrong/empty; else first wrong/empty cell.
+        const pickTarget = () => {
+          const choose = (r, c) => {
+            if (getCellStr(puzzleStr, r, c) !== 0) return null; // clue - skip
+            const cur = getCellStr(currentStr, r, c);
+            const sol = getCellStr(solvedStr, r, c);
+            if (cur !== sol) return { r, c, sol };
+            return null;
+          };
+
+          if (selected) {
+            const t = choose(selected.row, selected.col);
+            if (t) return t;
+          }
+          for (let r = 0; r < 9; r++) {
+            for (let c = 0; c < 9; c++) {
+              const t = choose(r, c);
+              if (t) return t;
+            }
+          }
+          return null;
+        };
+
+        const target = pickTarget();
+        if (!target) return; // nothing to hint
+
+        const { r, c, sol } = target;
+        const i = idx(r, c);
+        const nextStr = setCellStr(currentStr, r, c, sol);
+
+        // remove from invalid if present
+        const { invalidIdxs } = get();
+        const nextInvalid = invalidIdxs && invalidIdxs.length ? invalidIdxs.filter((k) => k !== i) : [];
+
+        set({
+          currentStr: nextStr,
+          invalidIdxs: nextInvalid,
+          hints: hints - 1,
+        });
+
+        const { selected: sel } = get();
+        if (sel && sel.row === r && sel.col === c) {
+          set({ selected: { ...sel, digit: sol } });
+        }
+      },
+
+      // --- Mistake counting inside setCell ---
+      setCell: (row, col, val /* 0-9 */) => {
+        const {
+          puzzleStr,
+          currentStr,
+          solvedStr,
+          invalidIdxs = [],
+          mistakes,
+          mistakeLimit,
+          isGameOver,
+          selected,
+        } = get();
+        if (isGameOver || !currentStr || !puzzleStr || !solvedStr) return;
+
+        // lock clues
         if (getCellStr(puzzleStr, row, col) !== 0) return;
 
         const i = idx(row, col);
+        const solvedDigit = getCellStr(solvedStr, row, col);
         const nextStr = setCellStr(currentStr, row, col, val);
 
-        const solvedDigit = getCellStr(solvedStr, row, col);
         let nextInvalid = invalidIdxs;
 
         if (val === 0 || val === solvedDigit) {
-          // correct or cleared -> remove from invalid
+          // Correct or cleared -> remove from invalid
           if (nextInvalid.includes(i)) nextInvalid = nextInvalid.filter((k) => k !== i);
+          set({ currentStr: nextStr, invalidIdxs: nextInvalid });
         } else {
-          // wrong -> add to invalid if not already there
+          // Wrong entry -> add invalid + count mistake
           if (!nextInvalid.includes(i)) nextInvalid = [...nextInvalid, i];
+          const newMistakes = mistakes + 1;
+          const over = newMistakes >= mistakeLimit;
+          set({
+            currentStr: nextStr,
+            invalidIdxs: nextInvalid,
+            mistakes: newMistakes,
+            isGameOver: over,
+            gameOverReason: over ? "mistakes" : null,
+            isGameRunning: over ? false : get().isGameRunning,
+          });
         }
 
-        set({ currentStr: nextStr, invalidIdxs: nextInvalid });
-
-        // keep selected.digit in sync if this cell is selected
+        // keep selected.digit in sync
         if (selected && selected.row === row && selected.col === col) {
           set({ selected: { ...selected, digit: val } });
         }

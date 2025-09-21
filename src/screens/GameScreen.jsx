@@ -1,36 +1,51 @@
+import { useMemo } from "react";
 import FeatherIcon from "feather-icons-react";
 import ActionButton from "@/components/ActionButton";
+import GameBoard from "@/components/GameBoard";
 import { useAppStore } from "@/stores/appStore";
-import GameTimer from "@/components/GameTimer";
-import { useMemo } from "react";
-
-const cn = (...xs) => xs.filter(Boolean).join(" ");
+import Counters from "@/components/Counters";
+import GameOverModal from "@/components/GameOverModal";
 
 const GameScreen = () => {
   const {
     getCurrentBoard,
     getPuzzleBoard,
-    invalidIdxs,
+    hints,
+    isGameOver,
     isPaused,
+    invalidIdxs,
     logout,
     pauseGame,
     resumeGame,
     selected,
     setCell,
     setScreen,
-    setSelectedCell,
+    useHint,
   } = useAppStore();
 
   const current = getCurrentBoard();
   const puzzle = getPuzzleBoard();
 
+  const invalidSet = useMemo(() => new Set(invalidIdxs), [invalidIdxs]);
   const remainingCounts = useMemo(() => {
-    const freq = Array(10).fill(0); // index 1–9
-    current.flat().forEach((v) => {
-      if (v >= 1 && v <= 9) freq[v] += 1;
-    });
+    if (!current) return Array(9).fill(9);
+    const freq = Array(10).fill(0); // count for digits 1..9
+
+    for (let r = 0; r < 9; r++) {
+      for (let c = 0; c < 9; c++) {
+        const v = current[r][c];
+        if (v >= 1 && v <= 9) {
+          const index = r * 9 + c;
+          if (!invalidSet.has(index)) {
+            freq[v] += 1; // count only valid placements
+          }
+        }
+      }
+    }
+
+    // remaining = 9 - valid placements
     return Array.from({ length: 9 }, (_, i) => Math.max(0, 9 - freq[i + 1]));
-  }, [current]);
+  }, [current, invalidSet]);
 
   const handleGoBack = () => {
     setScreen("difficulty");
@@ -68,88 +83,8 @@ const GameScreen = () => {
       </header>
 
       <div className="flex-1 flex flex-col items-center justify-center">
-        <div className="mb-4 flex justify-between w-full max-w-md">
-          <div
-            className="flex flex-col items-center justify-center bg-white rounded-lg p-3 shadow"
-            style={{ width: 80 }}
-          >
-            <p className="text-gray-500 text-sm">Time</p>
-            <p className="font-bold">
-              <GameTimer />
-            </p>
-          </div>
-          <div className="flex flex-col items-center justify-center bg-white rounded-lg p-3 shadow">
-            <p className="text-gray-500 text-sm">Mistakes</p>
-            <p className="font-bold">0/3</p>
-          </div>
-          <div
-            className="flex flex-col items-center justify-center bg-white rounded-lg p-3 shadow"
-            style={{ width: 80 }}
-          >
-            <p className="text-gray-500 text-sm">Hints</p>
-            <p className="font-bold">3</p>
-          </div>
-        </div>
-
-        <div className="sudoku-board w-full max-w-md">
-          {Array.from({ length: 3 }).map((_, boxRow) =>
-            Array.from({ length: 3 }).map((_, boxCol) => (
-              <div className="grid grid-cols-3 grid-rows-3 gap-[1px] bg-gray-500" key={`${boxRow}-${boxCol}`}>
-                {Array.from({ length: 3 }).map((_, r) =>
-                  Array.from({ length: 3 }).map((_, c) => {
-                    const row = boxRow * 3 + r;
-                    const col = boxCol * 3 + c;
-                    const digit = current[row][col];
-                    const clue = puzzle[row][col] !== 0;
-                    const index = row * 9 + col;
-
-                    const isSelected = selected?.row === row && selected?.col === col;
-                    const sameRow = selected?.row === row;
-                    const sameCol = selected?.col === col;
-                    const sameBox = selected?.boxRow === boxRow && selected?.boxCol === boxCol;
-
-                    // Only non-clue, non-zero entries can be invalid
-                    const isInvalid = !clue && digit !== 0 && invalidIdxs.includes(index);
-
-                    // Same-digit highlight (optional) — keep but let invalid win
-                    const isSameDigit = !isInvalid && digit !== 0 && selected?.digit === digit;
-
-                    const className = cn(
-                      "relative flex items-center justify-center text-xl aspect-square select-none",
-                      clue ? "font-semibold text-gray-900" : "cursor-pointer",
-                      // Invalid trumps other highlights
-                      isInvalid
-                        ? isSelected
-                          ? "bg-rose-200 text-rose-800 font-bold"
-                          : "bg-rose-100 text-rose-600"
-                        : isSelected
-                        ? "bg-purple-200 text-purple-800 font-bold"
-                        : isSameDigit
-                        ? "bg-purple-100 text-purple-800"
-                        : sameRow || sameCol || sameBox
-                        ? "bg-gray-200 text-gray-800"
-                        : "bg-white text-gray-800"
-                    );
-
-                    return (
-                      <div
-                        key={`${row}-${col}`}
-                        className={className}
-                        data-index={index}
-                        onClick={() => setSelectedCell(row, col)}
-                        aria-label={`r${row + 1}c${col + 1} ${clue ? "given" : "editable"} ${
-                          isInvalid ? "invalid" : ""
-                        }`}
-                      >
-                        {digit || ""}
-                      </div>
-                    );
-                  })
-                )}
-              </div>
-            ))
-          )}
-        </div>
+        <Counters />
+        <GameBoard />
 
         <div className="w-full max-w-md my-4 grid grid-cols-9 gap-1">
           {Array.from({ length: 9 }).map((_, idx) => {
@@ -191,7 +126,18 @@ const GameScreen = () => {
             className="bg-gray-200 hover:bg-gray-300"
             onClick={() => setCell(selected?.row, selected?.col, 0)}
           />
-          <ActionButton icon="info" label="Hint" className="bg-purple-600 hover:bg-purple-700 font-bold text-white" />
+          <ActionButton
+            icon="info"
+            label="Hint"
+            className={[
+              "font-bold",
+              hints <= 0 || isGameOver
+                ? "text-gray-400 bg-gray-300 pointer-events-none"
+                : "text-white bg-purple-600 hover:bg-purple-700",
+            ].join(" ")}
+            onClick={useHint}
+            disabled={hints <= 0 || isGameOver}
+          />
           <ActionButton
             icon={isPaused ? "play" : "pause-circle"}
             label={isPaused ? "Continue" : "Pause"}
@@ -202,6 +148,7 @@ const GameScreen = () => {
 
         <div className="flex space-x-4 w-full max-w-md"></div>
       </div>
+      <GameOverModal />
     </>
   );
 };
