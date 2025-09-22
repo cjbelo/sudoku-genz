@@ -4,7 +4,8 @@ import { useAppStore } from "@/stores/appStore";
 import ActionButton from "@/components/ActionButton";
 
 const ResultScreen = () => {
-  const { setScreen, difficulty } = useAppStore();
+  const { setScreen, difficulty, elapsedMs, mistakes } = useAppStore();
+  const elapsed = Math.floor(elapsedMs / 1000);
 
   useEffect(() => {
     createConfetti();
@@ -54,11 +55,11 @@ const ResultScreen = () => {
             <div className="grid grid-cols-3 gap-4 mb-6">
               <div className="bg-gray-100 rounded-lg p-3">
                 <p className="text-gray-500 text-sm">Time</p>
-                <p className="font-bold text-lg">{formatTime(1000)}</p>
+                <p className="font-bold text-lg">{formatTime(elapsed)}</p>
               </div>
               <div className="bg-gray-100 rounded-lg p-3">
                 <p className="text-gray-500 text-sm">Mistakes</p>
-                <p className="font-bold text-lg">{1}</p>
+                <p className="font-bold text-lg">{mistakes}</p>
               </div>
               <div className="bg-gray-100 rounded-lg p-3">
                 <p className="text-gray-500 text-sm">Difficulty</p>

@@ -120,7 +120,7 @@ const GameScreen = () => {
         </div>
 
         <div className="grid grid-cols-2 gap-3 w-full max-w-md mb-4">
-          <ActionButton icon="edit" label="Notes" className="bg-gray-200 hover:bg-gray-300" />
+          <ActionButton icon="edit" label="Fill Notes" className="bg-gray-200 hover:bg-gray-300" />
           <ActionButton
             icon="delete"
             label="Erase"

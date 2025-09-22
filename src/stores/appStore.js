@@ -195,9 +195,10 @@ export const useAppStore = create(
         if (sel && sel.row === r && sel.col === c) {
           set({ selected: { ...sel, digit: sol } });
         }
+
+        get().checkSolved();
       },
 
-      // --- Mistake counting inside setCell ---
       setCell: (row, col, val /* 0-9 */) => {
         const {
           puzzleStr,
@@ -243,6 +244,8 @@ export const useAppStore = create(
         if (selected && selected.row === row && selected.col === col) {
           set({ selected: { ...selected, digit: val } });
         }
+
+        get().checkSolved();
       },
 
       // Utility to recompute all invalids at once (e.g., after load/rehydrate)
@@ -259,6 +262,21 @@ export const useAppStore = create(
           }
         }
         set({ invalidIdxs: out });
+      },
+
+      checkSolved: () => {
+        const { currentStr, solvedStr, elapsedMs, startTime } = get();
+        if (!currentStr || !solvedStr) return;
+
+        if (currentStr === solvedStr) {
+          const now = Date.now();
+          set({
+            isGameRunning: false,
+            isPaused: true,
+            elapsedMs: elapsedMs + (now - startTime),
+            screen: "result",
+          });
+        }
       },
 
       pauseGame: () => {
