@@ -1,10 +1,20 @@
 import { useMemo } from "react";
-import FeatherIcon from "feather-icons-react";
 import ActionButton from "@/components/ActionButton";
 import GameBoard from "@/components/GameBoard";
 import { useAppStore } from "@/stores/appStore";
 import Counters from "@/components/Counters";
 import GameOverModal from "@/components/GameOverModal";
+import {
+  ArrowClockwiseIcon,
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  EraserIcon,
+  InfoIcon,
+  PauseIcon,
+  PencilIcon,
+  PlayIcon,
+  SignOutIcon,
+} from "@phosphor-icons/react";
 
 const GameScreen = () => {
   const {
@@ -64,10 +74,10 @@ const GameScreen = () => {
       <header className="w-full flex justify-between items-center mb-4">
         <div className="flex space-x-2">
           <button className="p-2 rounded-full bg-white shadow cursor-pointer" onClick={handleGoBack}>
-            <FeatherIcon icon="arrow-left" />
+            <ArrowLeftIcon size={22} />
           </button>
           <button className="p-2 rounded-full bg-white shadow opacity-0 pointer-events-none">
-            <FeatherIcon icon="arrow-right" />
+            <ArrowRightIcon size={22} />
           </button>
         </div>
         <h1 className="text-xl font-bold text-gray-800">
@@ -75,10 +85,10 @@ const GameScreen = () => {
         </h1>
         <div className="flex space-x-2">
           <button className="p-2 rounded-full bg-white shadow cursor-pointer" onClick={() => setScreen("result")}>
-            <FeatherIcon icon="refresh-cw" />
+            <ArrowClockwiseIcon size={22} />
           </button>
           <button className="p-2 rounded-full bg-white shadow cursor-pointer" onClick={setIsLogout}>
-            <FeatherIcon icon="log-out" />
+            <SignOutIcon size={22} />
           </button>
         </div>
       </header>
@@ -96,7 +106,7 @@ const GameScreen = () => {
               <button
                 key={`${digit}-button`}
                 className={[
-                  "aspect-[3/4] rounded-lg hover:bg-purple-200 transition flex flex-col items-center justify-center relative",
+                  "aspect-[3/4] rounded-lg pointer-fine:hover:bg-purple-200 transition flex flex-col items-center justify-center relative",
                   left === 0 ? "bg-gray-200 pointer-events-none" : "bg-purple-100 cursor-pointer",
                 ].join(" ")}
                 onClick={() => setCell(selected?.row, selected?.col, digit)}
@@ -120,29 +130,29 @@ const GameScreen = () => {
         </div>
 
         <div className="grid grid-cols-2 gap-3 w-full max-w-md mb-4">
-          <ActionButton icon="edit" label="Fill Notes" className="bg-gray-200 hover:bg-gray-300" />
+          <ActionButton Icon={PencilIcon} label="Fill Notes" className="bg-gray-200 pointer-fine:hover:bg-gray-300" />
           <ActionButton
-            icon="delete"
+            Icon={EraserIcon}
             label="Erase"
-            className="bg-gray-200 hover:bg-gray-300"
+            className="bg-gray-200 pointer-fine:hover:bg-gray-300"
             onClick={() => setCell(selected?.row, selected?.col, 0)}
           />
           <ActionButton
-            icon="info"
+            Icon={InfoIcon}
             label="Hint"
             className={[
               "font-bold",
               hints <= 0 || isGameOver
                 ? "text-gray-400 bg-gray-300 pointer-events-none"
-                : "text-white bg-purple-600 hover:bg-purple-700",
+                : "text-white bg-purple-600 pointer-fine:hover:bg-purple-700",
             ].join(" ")}
             onClick={useHint}
             disabled={hints <= 0 || isGameOver}
           />
           <ActionButton
-            icon={isPaused ? "play" : "pause-circle"}
+            Icon={isPaused ? PlayIcon : PauseIcon}
             label={isPaused ? "Continue" : "Pause"}
-            className="bg-white hover:bg-gray-100 font-bold"
+            className="bg-white pointer-fine:hover:bg-gray-100 font-bold"
             onClick={handlePauseToggle}
           />
         </div>

@@ -1,38 +1,39 @@
-import { useAppStore } from "@/stores/appStore";
-import DifficultyScreen from "@/screens/DifficultyScreen";
-import GameScreen from "@/screens/GameScreen";
-import LoginScreen from "@/screens/LoginScreen";
-import ResultScreen from "@/screens/ResultScreen";
-import LogoutModal from "@/components/LogoutModal";
+import React, { Suspense, lazy } from "react";
+import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
+import ScrollToHashElement from "@/components/ScrollToHashElement";
 
-const App = () => {
-  const { screen } = useAppStore();
+const Landing = lazy(() => import("@/pages/Landing.jsx"));
+const Game = lazy(() => import("@/pages/Game.jsx"));
+const Privacy = lazy(() => import("@/pages/Privacy.jsx"));
+const Terms = lazy(() => import("@/pages/Terms.jsx"));
+const Contact = lazy(() => import("@/pages/Contact.jsx"));
+const NotFound = lazy(() => import("@/pages/NotFound.jsx"));
 
-  let content;
-  switch (screen) {
-    case "difficulty":
-      content = <DifficultyScreen />;
-      break;
-    case "game":
-      content = <GameScreen />;
-      break;
-    case "result":
-      content = <ResultScreen />;
-      break;
-    case "login":
-    default:
-      content = <LoginScreen />;
-      break;
-  }
-
+function RootLayout() {
   return (
     <>
-      <div className="text-gray-800 antialiased">
-        <div className="app-container bg-gray-50 flex flex-col items-center justify-center p-4">{content}</div>
-      </div>
-      <LogoutModal />
+      <ScrollToHashElement />
+      <Suspense fallback={null}>
+        <Outlet />
+      </Suspense>
     </>
   );
-};
+}
 
-export default App;
+const router = createBrowserRouter([
+  {
+    element: <RootLayout />,
+    children: [
+      { index: true, element: <Landing /> },
+      { path: "game", element: <Game /> },
+      { path: "privacy", element: <Privacy /> },
+      { path: "terms", element: <Terms /> },
+      { path: "contact", element: <Contact /> },
+      { path: "*", element: <NotFound /> },
+    ],
+  },
+]);
+
+export default function App() {
+  return <RouterProvider router={router} />;
+}

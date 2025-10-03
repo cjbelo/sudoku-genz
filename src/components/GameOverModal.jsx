@@ -20,13 +20,13 @@ const GameOverModal = () => {
             <ActionButton
               label="Restart"
               icon="refresh-cw"
-              className="bg-purple-600 hover:bg-purple-700 text-white"
+              className="bg-purple-600 pointer-fine:hover:bg-purple-700 text-white"
               onClick={restartSameDifficulty}
             />
             <ActionButton
               label="Select Difficulty"
               icon="chevron-down"
-              className="bg-gray-200 hover:bg-gray-300"
+              className="bg-gray-200 pointer-fine:hover:bg-gray-300"
               onClick={() => setScreen("difficulty")}
             />
           </div>

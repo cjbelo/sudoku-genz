@@ -1,6 +1,6 @@
-import FeatherIcon from "feather-icons-react";
 import { useAppStore } from "@/stores/appStore";
 import LevelButtons from "@/components/LevelButtons";
+import { SignOutIcon } from "@phosphor-icons/react";
 
 const DifficultyScreen = () => {
   const { currentUserDisplay, setIsLogout } = useAppStore();
@@ -9,7 +9,7 @@ const DifficultyScreen = () => {
       <header className="flex justify-end items-center gap-3 w-full mb-4">
         <span className="text-purple-800">Hello, {currentUserDisplay}</span>
         <button className="p-2 rounded-full bg-white shadow cursor-pointer" onClick={setIsLogout}>
-          <FeatherIcon icon="log-out" />
+          <SignOutIcon size={22} />
         </button>
       </header>
       <div className="flex-1 flex flex-col items-center justify-center w-full max-w-md">

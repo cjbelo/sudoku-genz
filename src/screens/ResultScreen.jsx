@@ -2,6 +2,7 @@ import FeatherIcon from "feather-icons-react";
 import { useEffect, useMemo } from "react";
 import { useAppStore } from "@/stores/appStore";
 import ActionButton from "@/components/ActionButton";
+import { LightningIcon } from "@phosphor-icons/react";
 
 const formatTime = (seconds) => {
   const m = Math.floor(seconds / 60);
@@ -60,7 +61,7 @@ const ResultScreen = () => {
       <div id="confetti-container" className="fixed inset-0 overflow-hidden pointer-events-none z-0"></div>
       <div className="w-full max-w-md text-center z-10">
         <div
-          className="bg-white rounded-2xl shadow-xl overflow-hidden transform transition-all duration-500 hover:shadow-2xl"
+          className="bg-white rounded-2xl shadow-xl overflow-hidden transform transition-all duration-500 pointer-fine:hover:shadow-2xl"
           data-aos="zoom-in"
         >
           <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-6 text-white text-center">
@@ -98,13 +99,13 @@ const ResultScreen = () => {
               <ActionButton
                 icon="play"
                 label="Play Again"
-                className="font-semibold border border-gray-300 hover:bg-gray-100"
+                className="font-semibold border border-gray-300 pointer-fine:hover:bg-gray-100"
                 onClick={handlePlayAgain}
               />
               <ActionButton
                 icon="share-2"
                 label="Share"
-                className="font-semibold bg-purple-500 text-white hover:bg-purple-600"
+                className="font-semibold bg-purple-500 text-white pointer-fine:hover:bg-purple-600"
                 onClick={handlePlayAgain}
               />
             </div>
@@ -132,29 +133,31 @@ const ResultScreen = () => {
                 </div>
 
                 <div>
-                  <div className="flex justify-between mb-1">
+                  <div className="flex justify-between">
                     <span className="text-gray-600">Avg. Time</span>
                     <span className="font-bold">{avgTimeStr}</span>
                   </div>
                   <div className="text-xs text-gray-500">Your best: {bestTimeStr}</div>
                 </div>
 
-                <div className="pt-3 border-t border-gray-200">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <div className="text-gray-600">Current Streak</div>
-                      <div className="text-xs text-gray-500">
-                        {currentStreak > 0 ? `${currentStreak} in a row` : "No active streak"}
+                {currentStreak > 1 && (
+                  <div className="mt-1 pt-3 border-t border-gray-200">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <div className="text-gray-600">Current Streak</div>
+                        <div className="text-xs text-gray-500">
+                          {currentStreak > 0 ? `${currentStreak} in a row` : "No active streak"}
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600 font-bold">
-                        {currentStreak}
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600 font-bold">
+                          {currentStreak}
+                        </div>
+                        <LightningIcon size={22} className="text-yellow-500" />
                       </div>
-                      <FeatherIcon icon="zap" className="text-yellow-500" />
                     </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
           </div>

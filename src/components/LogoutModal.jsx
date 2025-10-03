@@ -18,10 +18,15 @@ const LogoutModal = () => {
             <ActionButton
               label="Yes, Logout"
               icon="log-out"
-              className="bg-red-500 hover:bg-red-600 text-white"
+              className="bg-red-500 pointer-fine:hover:-translate-y-1 text-white active:scale-98"
               onClick={logout}
             />
-            <ActionButton label="Cancel" icon="x" className="bg-gray-200 hover:bg-gray-300" onClick={clearIsLogout} />
+            <ActionButton
+              label="Cancel"
+              icon="x"
+              className="bg-gray-300 pointer-fine:hover:-translate-y-1 active:scale-98"
+              onClick={clearIsLogout}
+            />
           </div>
         </div>
       </div>

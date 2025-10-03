@@ -15,7 +15,8 @@ const LevelButtons = () => {
         <button
           key={`level-${l.level}`}
           onClick={() => setGameStart(l.level)}
-          className="bg-white rounded-xl shadow-md p-6 text-center transition-transform cursor-pointer hover:-translate-y-1 hover:shadow-lg"
+          className="bg-white rounded-xl shadow-md p-6 text-center transition-transform cursor-pointer
+                     pointer-fine:hover:-translate-y-1 pointer-fine:hover:shadow-lg active:scale-98"
         >
           <div className="text-4xl mb-4">{l.emoji}</div>
           <h3 className={["font-bold text-lg capitalize", l.color].join(" ")}>{l.level}</h3>

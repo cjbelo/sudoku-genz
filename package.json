@@ -11,10 +11,12 @@
   },
   "dependencies": {
     "@fontsource/poppins": "^5.2.7",
+    "@phosphor-icons/react": "^2.1.10",
     "@tailwindcss/vite": "^4.1.13",
-    "feather-icons-react": "^0.9.0",
+    "aos": "^2.3.4",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "react-router-dom": "^7.9.3",
     "zustand": "^5.0.8"
   },
   "devDependencies": {

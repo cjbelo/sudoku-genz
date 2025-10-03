@@ -1,0 +1,80 @@
+<svg
+  class="w-64 h-64"
+  viewBox="0 0 256 256"
+  xmlns="http://www.w3.org/2000/svg"
+  aria-label="Sudoku Gen Z grid"
+>
+  <!-- Outer padding and purple background -->
+  <rect x="0" y="0" width="256" height="256" rx="10" fill="#764ba2"/>
+  <!-- Board area -->
+  <g transform="translate(2,2)">
+    <!-- Board background -->
+    <rect x="0" y="0" width="252" height="252" fill="#ffffff" rx="6"/>
+
+    <!-- Grid lines (thin) -->
+    <g stroke="#764ba2" stroke-width="1">
+      <!-- verticals -->
+      <path d="M28 0 V252 M56 0 V252 M84 0 V252 M112 0 V252 M140 0 V252 M168 0 V252 M196 0 V252 M224 0 V252"/>
+      <!-- horizontals -->
+      <path d="M0 28 H252 M0 56 H252 M0 84 H252 M0 112 H252 M0 140 H252 M0 168 H252 M0 196 H252 M0 224 H252"/>
+    </g>
+
+    <!-- 3x3 block separators (thick) -->
+    <g stroke="#764ba2" stroke-width="3">
+      <path d="M84 0 V252 M168 0 V252"/>
+      <path d="M0 84 H252 M0 168 H252"/>
+    </g>
+
+    <!-- Numbers -->
+    <g font-family="system-ui, -apple-system, Segoe UI, Roboto, Poppins, Arial" font-size="16" font-weight="600" fill="#333">
+      <!-- helper: each cell is 28x28; center at (col*28+14, row*28+14) -->
+      <!-- Row 1 -->
+      <text x="14" y="14" text-anchor="middle" dominant-baseline="middle">5</text>
+      <text x="42" y="14" text-anchor="middle" dominant-baseline="middle">3</text>
+      <text x="126" y="14" text-anchor="middle" dominant-baseline="middle">7</text>
+
+      <!-- Row 2 -->
+      <text x="14"  y="42" text-anchor="middle" dominant-baseline="middle">6</text>
+      <text x="99" y="42" text-anchor="middle" dominant-baseline="middle">1</text>
+      <text x="126" y="42" text-anchor="middle" dominant-baseline="middle">9</text>
+      <text x="154" y="42" text-anchor="middle" dominant-baseline="middle">5</text>
+
+      <!-- Row 3 -->
+      <text x="42"  y="70" text-anchor="middle" dominant-baseline="middle">9</text>
+      <text x="70"  y="70" text-anchor="middle" dominant-baseline="middle">8</text>
+      <text x="182" y="70" text-anchor="middle" dominant-baseline="middle">6</text>
+
+      <!-- Row 4 -->
+      <text x="14"  y="98"  text-anchor="middle" dominant-baseline="middle">8</text>
+      <text x="126" y="98"  text-anchor="middle" dominant-baseline="middle">6</text>
+      <text x="210" y="98"  text-anchor="middle" dominant-baseline="middle">3</text>
+
+      <!-- Row 5 -->
+      <text x="14"  y="126" text-anchor="middle" dominant-baseline="middle">4</text>
+      <text x="99" y="126" text-anchor="middle" dominant-baseline="middle">8</text>
+      <text x="153" y="126" text-anchor="middle" dominant-baseline="middle">3</text>
+      <text x="210" y="126" text-anchor="middle" dominant-baseline="middle">1</text>
+
+      <!-- Row 6 -->
+      <text x="14"  y="154" text-anchor="middle" dominant-baseline="middle">7</text>
+      <text x="126" y="154" text-anchor="middle" dominant-baseline="middle">2</text>
+      <text x="210" y="154" text-anchor="middle" dominant-baseline="middle">6</text>
+
+      <!-- Row 7 -->
+      <text x="42"  y="182" text-anchor="middle" dominant-baseline="middle">6</text>
+      <text x="182" y="182" text-anchor="middle" dominant-baseline="middle">2</text>
+      <text x="210" y="182" text-anchor="middle" dominant-baseline="middle">8</text>
+
+      <!-- Row 8 -->
+      <text x="99" y="210" text-anchor="middle" dominant-baseline="middle">4</text>
+      <text x="126" y="210" text-anchor="middle" dominant-baseline="middle">1</text>
+      <text x="153" y="210" text-anchor="middle" dominant-baseline="middle">9</text>
+      <text x="210" y="210" text-anchor="middle" dominant-baseline="middle">5</text>
+
+      <!-- Row 9 -->
+      <text x="126" y="238" text-anchor="middle" dominant-baseline="middle">8</text>
+      <text x="153" y="238" text-anchor="middle" dominant-baseline="middle">7</text>
+      <text x="210" y="238" text-anchor="middle" dominant-baseline="middle">9</text>
+    </g>
+  </g>
+</svg>

@@ -1,6 +1,4 @@
-import FeatherIcon from "feather-icons-react";
-
-const ActionButton = ({ icon = null, label, onClick, className = "" }) => {
+const ActionButton = ({ Icon = null, label, onClick, className = "" }) => {
   return (
     <button
       className={[
@@ -9,7 +7,7 @@ const ActionButton = ({ icon = null, label, onClick, className = "" }) => {
       ].join(" ")}
       onClick={onClick}
     >
-      {icon && <FeatherIcon icon={icon} size={20} />}
+      {Icon && <Icon size={22} />}
       {label}
     </button>
   );
