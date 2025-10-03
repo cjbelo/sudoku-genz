@@ -1,4 +1,3 @@
-import FeatherIcon from "feather-icons-react";
 import { useEffect, useMemo } from "react";
 import { useAppStore } from "@/stores/appStore";
 import ActionButton from "@/components/ActionButton";
