@@ -1,10 +1,11 @@
 import React, { useEffect } from "react";
+import AOS from "aos";
 import { Link } from "react-router-dom";
 import { BrainIcon, ChartLineUpIcon, ClockIcon } from "@phosphor-icons/react";
-import grid9x9 from "@/assets/9x9.svg";
 import Footer from "@/components/Footer";
 import MainNav from "@/components/MainNav";
-import AOS from "aos";
+import grid9x9 from "@/assets/9x9.svg";
+import legoPlay from "@/assets/lego-playing-sudoku.png";
 
 export default function Landing() {
   useEffect(() => {
@@ -78,8 +79,8 @@ export default function Landing() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <h2 className="mb-12 text-center text-3xl font-bold text-gray-800">How to Play Sudoku</h2>
 
-          <div className="grid grid-cols-1 items-center gap-8 md:grid-cols-2">
-            <div data-aos="fade-right">
+          <div className="grid grid-cols-1 items-strech gap-8 md:grid-cols-2">
+            <div data-aos="fade-right" className="flex flex-col justify-between">
               <div className="mb-6 rounded-xl bg-white p-6 shadow-md">
                 <h3 className="mb-3 flex items-center text-xl font-bold text-gray-800">
                   <span className="mr-3 flex h-8 w-8 items-center justify-center rounded-full bg-purple-600 text-white">
@@ -120,11 +121,11 @@ export default function Landing() {
               </div>
             </div>
 
-            <div data-aos="fade-left">
+            <div data-aos="fade-left" className="flex">
               <img
-                src="http://static.photos/education/640x360/42"
-                alt="Sudoku example"
-                className="w-full rounded-xl shadow-md"
+                src={legoPlay}
+                alt="Lego Playing Sudoku"
+                className="w-full h-full rounded-xl shadow-md object-cover"
               />
             </div>
           </div>
