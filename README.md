@@ -2,9 +2,7 @@
 
 A modern Sudoku PWA built with **React + Vite**, **TailwindCSS**, and **Zustand**. Installable on mobile and desktop, works offline, and supports multiple player profiles with per‑user stats persistence.
 
-<p align="center">
-  <img alt="Sudoku Gen Z" src="https://sudoku-genz.netlify.app/screenshot-1.webp" width="100%" />
-</p>
+![Sudoku Gen Z cover](public/screenshot-1.webp)
 
 ---
 
