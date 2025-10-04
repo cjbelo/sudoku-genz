@@ -14,10 +14,8 @@ export default defineConfig({
     react(),
     tailwindcss(),
     VitePWA({
+      devOptions: { enabled: false },
       includeAssets: ["**/*"],
-      devOptions: {
-        enabled: true,
-      },
       name: "Sudoku Gen Z",
       short_name: "Sudoku Gen Z",
       description: "Play the classic puzzle game with a modern twist",

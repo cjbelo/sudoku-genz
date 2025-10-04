@@ -13,7 +13,7 @@ export default function Landing() {
   }, []);
 
   return (
-    <div className="bg-gray-50 text-gray-900">
+    <div className="bg-gray-50 text-gray-900 max-w-full overflow-x-hidden">
       <MainNav />
 
       <section className="py-20 text-white bg-gradient-to-br from-purple-600 to-indigo-600">
@@ -79,7 +79,7 @@ export default function Landing() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <h2 className="mb-12 text-center text-3xl font-bold text-gray-800">How to Play Sudoku</h2>
 
-          <div className="grid grid-cols-1 items-strech gap-8 md:grid-cols-2">
+          <div className="grid grid-cols-1 items-strech gap-6 md:grid-cols-2">
             <div data-aos="fade-right" className="flex flex-col justify-between">
               <div className="mb-6 rounded-xl bg-white p-6 shadow-md">
                 <h3 className="mb-3 flex items-center text-xl font-bold text-gray-800">
