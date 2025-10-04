@@ -109,8 +109,8 @@ const GameScreen = () => {
         return;
       }
 
-      // Ignore other inputs while paused
-      if (isPaused) return;
+      // Ignore other inputs while paused or game over
+      if (isPaused || isGameOver) return;
 
       // Navigation
       switch (e.key) {
