@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useCallback, useEffect } from "react";
 import ActionButton from "@/components/ActionButton";
 import GameBoard from "@/components/GameBoard";
 import { useAppStore } from "@/stores/appStore";
@@ -30,6 +30,7 @@ const GameScreen = () => {
     setIsLogout,
     setCell,
     setScreen,
+    setSelectedCell,
     useHint,
   } = useAppStore();
 
@@ -58,6 +59,126 @@ const GameScreen = () => {
     return Array.from({ length: 9 }, (_, i) => Math.max(0, 9 - freq[i + 1]));
   }, [current, invalidSet]);
 
+  // --- Helper: find the first editable ---
+  const getFirstEditable = useCallback(() => {
+    if (!puzzle) return { row: 0, col: 0 };
+    for (let r = 0; r < 9; r++) {
+      for (let c = 0; c < 9; c++) {
+        if (puzzle[r][c] === 0) return { row: r, col: c };
+      }
+    }
+    return { row: 0, col: 0 };
+  }, [puzzle]);
+
+  // --- Helper: move selection with wrapping ---
+  const moveSelected = useCallback(
+    (dr, dc) => {
+      const base = selected ?? getFirstEditable();
+      const row = (base.row + dr + 9) % 9;
+      const col = (base.col + dc + 9) % 9;
+      setSelectedCell(row, col);
+    },
+    [selected, setSelectedCell, getFirstEditable]
+  );
+
+  // Treat desktop/laptop only (pointer: fine)
+  const isHardwarePointer = useMemo(() => {
+    try {
+      return typeof window !== "undefined" && window.matchMedia && window.matchMedia("(pointer: fine)").matches;
+    } catch {
+      return true; // fall back to true
+    }
+  }, []);
+
+  // --- Keyboard handler ---
+  useEffect(() => {
+    if (!current || !puzzle || !isHardwarePointer) return;
+
+    const onKeyDown = (e) => {
+      // Allow shortcuts even without existing selection
+      const sel = selected ?? getFirstEditable();
+
+      // Space/arrow keys scroll page by default; prevent when we handle them
+      const preventKeys = new Set(["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "]);
+
+      // Pause/resume always allowed via P/Space
+      if (e.key === "p" || e.key === "P" || e.key === " ") {
+        e.preventDefault();
+        if (isPaused) resumeGame();
+        else pauseGame();
+        return;
+      }
+
+      // Ignore other inputs while paused
+      if (isPaused) return;
+
+      // Navigation
+      switch (e.key) {
+        case "ArrowUp":
+          e.preventDefault();
+          moveSelected(-1, 0);
+          return;
+        case "ArrowDown":
+          e.preventDefault();
+          moveSelected(1, 0);
+          return;
+        case "ArrowLeft":
+          e.preventDefault();
+          moveSelected(0, -1);
+          return;
+        case "ArrowRight":
+          e.preventDefault();
+          moveSelected(0, 1);
+          return;
+      }
+
+      // Actions
+      if (e.key === "h" || e.key === "H") {
+        e.preventDefault();
+        if (!isGameOver && hints > 0) useHint();
+        return;
+      }
+
+      // Prevent page scroll for handled keys
+      if (preventKeys.has(e.key)) e.preventDefault();
+
+      // Editing: only if cell is not a given
+      const isGiven = puzzle[sel.row][sel.col] !== 0;
+      if (isGiven) return;
+
+      // Clear cell
+      if (e.key === "Backspace" || e.key === "Delete" || e.key === "0") {
+        e.preventDefault();
+        setCell(sel.row, sel.col, 0);
+        return;
+      }
+
+      // Numbers 1-9
+      if (/^[1-9]$/.test(e.key)) {
+        const digit = Number(e.key);
+        setCell(sel.row, sel.col, digit);
+        return;
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [
+    current,
+    puzzle,
+    isHardwarePointer,
+    selected,
+    isPaused,
+    hints,
+    isGameOver,
+    moveSelected,
+    getFirstEditable,
+    setCell,
+    pauseGame,
+    resumeGame,
+    useHint,
+  ]);
+
   const handleGoBack = () => {
     setScreen("difficulty");
   };
@@ -84,7 +205,7 @@ const GameScreen = () => {
           Sudoku <span className="text-purple-600">Gen Z</span>
         </h1>
         <div className="flex space-x-2">
-          <button className="p-2 rounded-full bg-white shadow cursor-pointer" onClick={() => setScreen("result")}>
+          <button className="p-2 rounded-full bg-white shadow cursor-pointer" onClick={() => setScreen("difficulty")}>
             <ArrowClockwiseIcon size={22} />
           </button>
           <button className="p-2 rounded-full bg-white shadow cursor-pointer" onClick={setIsLogout}>
@@ -106,7 +227,7 @@ const GameScreen = () => {
               <button
                 key={`${digit}-button`}
                 className={[
-                  "aspect-[3/4] rounded-lg pointer-fine:hover:bg-purple-200 transition flex flex-col items-center justify-center relative",
+                  "aspect-[3/4] rounded-lg transition flex flex-col items-center justify-center relative pointer-fine:hover:-translate-y-1",
                   left === 0 ? "bg-gray-200 pointer-events-none" : "bg-purple-100 cursor-pointer",
                   isPaused ? "opacity-20 pointer-events-none" : "",
                 ].join(" ")}
@@ -131,29 +252,36 @@ const GameScreen = () => {
         </div>
 
         <div className="grid grid-cols-2 gap-3 w-full max-w-md mb-4">
-          <ActionButton Icon={PencilIcon} label="Fill Notes" className="bg-gray-200 pointer-fine:hover:bg-gray-300" />
+          <ActionButton
+            Icon={PencilIcon}
+            label="Fill Notes"
+            className="bg-gray-200 pointer-fine:hover:-translate-y-1 active:scale-98"
+          />
           <ActionButton
             Icon={EraserIcon}
             label="Erase"
-            className="bg-gray-200 pointer-fine:hover:bg-gray-300"
-            onClick={() => setCell(selected?.row, selected?.col, 0)}
+            className="bg-gray-200 pointer-fine:hover:-translate-y-1 active:scale-98"
+            onClick={() => !isPaused && setCell(selected?.row, selected?.col, 0)}
           />
           <ActionButton
             Icon={InfoIcon}
             label="Hint"
             className={[
               "font-bold",
-              hints <= 0 || isGameOver
+              hints <= 0
                 ? "text-gray-400 bg-gray-300 pointer-events-none"
-                : "text-white bg-purple-600 pointer-fine:hover:bg-purple-700",
+                : "text-white bg-purple-600 pointer-fine:hover:-translate-y-1 active:scale-98",
             ].join(" ")}
-            onClick={useHint}
+            onClick={!isPaused && useHint}
             disabled={hints <= 0 || isGameOver}
           />
           <ActionButton
             Icon={isPaused ? PlayIcon : PauseIcon}
             label={isPaused ? "Continue" : "Pause"}
-            className="bg-white pointer-fine:hover:bg-gray-100 font-bold"
+            className={[
+              "font-bold pointer-fine:hover:-translate-y-1 active:scale-98",
+              isPaused ? "bg-purple-600 text-white" : "bg-white",
+            ].join(" ")}
             onClick={handlePauseToggle}
           />
         </div>
