@@ -1,4 +1,5 @@
 import { useEffect, useMemo } from "react";
+import AOS from "aos";
 import { useAppStore } from "@/stores/appStore";
 import ActionButton from "@/components/ActionButton";
 import { LightningIcon } from "@phosphor-icons/react";
@@ -42,6 +43,7 @@ const ResultScreen = () => {
   };
 
   useEffect(() => {
+    AOS.init({ once: true, duration: 600, easing: "ease-out-quart" });
     createConfetti();
   }, []);
 
