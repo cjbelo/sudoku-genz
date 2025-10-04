@@ -3,7 +3,7 @@
 A modern Sudoku PWA built with **React + Vite**, **TailwindCSS**, and **Zustand**. Installable on mobile and desktop, works offline, and supports multiple player profiles with per‑user stats persistence.
 
 <p align="center">
-  <img alt="Sudoku Gen Z" src="https://sudoku-genz.netlify.app/pwa-icon-512-maskable.png" width="120" />
+  <img alt="Sudoku Gen Z" src="https://sudoku-genz.netlify.app/screenshot-1.webp" width="100%" />
 </p>
 
 ---
@@ -17,11 +17,8 @@ A modern Sudoku PWA built with **React + Vite**, **TailwindCSS**, and **Zustand*
 - [Available Scripts](#available-scripts)
 - [State & Persistence](#state--persistence)
 - [PWA Details](#pwa-details)
-- [Icons & Manifest](#icons--manifest)
 - [Deployment](#deployment)
-- [Roadmap](#roadmap)
-- [Troubleshooting](#troubleshooting)
-- [Contributing](#contributing)
+- [Live Demo](#live-demo)
 - [License](#license)
 
 ---
@@ -59,35 +56,6 @@ A modern Sudoku PWA built with **React + Vite**, **TailwindCSS**, and **Zustand*
 
 ---
 
-## Project Structure
-
-```
-.
-├─ public/
-│  ├─ favicon.ico
-│  ├─ favicon-16.png
-│  ├─ favicon-32.png
-│  ├─ apple-touch-icon-180.png
-│  ├─ pwa-icon-192.png
-│  ├─ pwa-icon-192-maskable.png
-│  ├─ pwa-icon-512.png
-│  └─ pwa-icon-512-maskable.png
-├─ src/
-│  ├─ components/
-│  ├─ screens/
-│  │  └─ LoginScreen.jsx
-│  ├─ stores/
-│  │  └─ appStore.js
-│  ├─ App.jsx
-│  └─ main.jsx
-├─ index.html
-├─ package.json
-├─ vite.config.js (or .ts)
-└─ README.md
-```
-
----
-
 ## Getting Started
 
 ### Prerequisites
@@ -104,6 +72,7 @@ npm install
 
 ```bash
 npm run dev
+npm run dev -- --host
 ```
 
 ### Build (Prod)
@@ -119,6 +88,17 @@ npm run preview -- --host
 ```
 
 > Use the preview server (or deploy to HTTPS hosting) to properly test PWA install & service worker.
+
+---
+
+## Routes
+
+- `/` — Landing
+- `/game` — Play
+- `/privacy` — Privacy Policy
+- `/terms` — Terms of Service
+- `/contact` — Contact
+- `*` — 404 (NotFound)
 
 ---
 
@@ -138,99 +118,9 @@ State is managed with **Zustand** and persisted via the `persist` middleware to 
 - **Named users**: stats are persisted under `userStats[username]` and restored on login and page refresh.
 - **Guest user**: login persists the _session_ user (so guest stays logged in across refresh), but **guest stats are not persisted** and reset on refresh.
 
-Example (store excerpt):
-
-```js
-export const useAppStore = create(
-  persist(
-    (set, get) => ({
-      currentUser: null,
-      screen: "login",
-      difficulty: "easy",
-      userStats: {},
-      stats: {},
-
-      login: (username) => {
-        if (username === "guest") {
-          set({ currentUser: "guest", screen: "difficulty", stats: {} });
-        } else {
-          const stats = get().userStats[username] || {};
-          set({ currentUser: username, screen: "difficulty", stats });
-        }
-      },
-
-      logout: () => set({ currentUser: null, screen: "login", stats: {} }),
-
-      saveStats: (newStats) => {
-        const { currentUser, userStats, stats } = get();
-        if (!currentUser) return;
-        const updated = { ...stats, ...newStats };
-        set({ stats: updated });
-        if (currentUser === "guest") return;
-        set({ userStats: { ...userStats, [currentUser]: updated } });
-      },
-    }),
-    {
-      name: "sudoku-genz",
-      getStorage: () => localStorage,
-      partialize: (s) => ({
-        currentUser: s.currentUser,
-        screen: s.screen,
-        difficulty: s.difficulty,
-        userStats: s.userStats,
-      }),
-      onRehydrateStorage: () => (state) => {
-        if (state?.currentUser === "guest") state.stats = {};
-      },
-    }
-  )
-);
-```
-
----
-
 ## PWA Details
 
 This project uses `vite-plugin-pwa` with a manifest and Workbox for caching.
-
-**vite.config.js** (excerpt):
-
-```js
-import { defineConfig } from "vite";
-import { VitePWA } from "vite-plugin-pwa";
-import react from "@vitejs/plugin-react-swc";
-import tailwindcss from "@tailwindcss/vite";
-
-export default defineConfig({
-  plugins: [
-    react(),
-    tailwindcss(),
-    VitePWA({
-      registerType: "autoUpdate",
-      injectRegister: "auto",
-      devOptions: { enabled: true, type: "module" },
-      workbox: { globPatterns: ["**/*.{js,css,html,ico,png,svg}"] },
-      manifest: {
-        id: "/sudoku-genz",
-        name: "Sudoku Gen Z",
-        short_name: "Sudoku Gen Z",
-        description: "Play the classic puzzle game with a modern twist",
-        theme_color: "#9810fa",
-        background_color: "#fbf9fa",
-        display: "standalone",
-        scope: "/",
-        start_url: "/",
-        icons: [
-          { src: "/pwa-icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
-          { src: "/pwa-icon-192-maskable.png", sizes: "192x192", type: "image/png", purpose: "maskable" },
-          { src: "/pwa-icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
-          { src: "/pwa-icon-512-maskable.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
-        ],
-      },
-    }),
-  ],
-});
-```
 
 ### iOS meta tags (index.html)
 
@@ -240,21 +130,6 @@ export default defineConfig({
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="theme-color" content="#9810fa" />
 ```
-
----
-
-## Icons & Manifest
-
-Place generated icons in `public/`:
-
-- `pwa-icon-192.png`
-- `pwa-icon-192-maskable.png`
-- `pwa-icon-512.png`
-- `pwa-icon-512-maskable.png`
-- `apple-touch-icon-180.png`
-- `favicon-16.png`, `favicon-32.png`, `favicon.ico`
-
-Maskable icons ensure proper rendering on Android without a small Chrome badge when installed as a true PWA.
 
 ---
 
@@ -274,56 +149,15 @@ General steps:
 
 ---
 
-## Roadmap
+## Live Demo
 
-- ✅ Name login + per‑user stats persistence
-- ✅ Guest session with non‑persisted stats
-- ⏳ Notes with invalid candidate highlighting
-- ⏳ Remaining digit counts (1–9)
-- ⏳ Cell selection border animation
-- ⏳ Box background/opacity wave animation (diagonal)
-- ⏳ Suggested candidates for empty cells
-- ⏳ Undo history
-- ⏳ Victory detection vs `solvedSudoku`
-- ⏳ Scoring system
-- ⏳ Timer (MM:SS)
-- ⏳ Optional cloud sync (future)
+https://sudoku-genz.netlify.app/game
 
 ---
 
-## Troubleshooting
+### License
 
-**"App installs but shows a tiny Chrome badge on icon / opens in Chrome UI"**
-
-- Ensure you install the **PWA** (not a shortcut). Use production build with an active service worker.
-- Include **maskable** icons in the manifest.
-- On **desktop**, Chrome overlays a small corner badge on PWA icons by design (cannot remove without a native wrapper).
-
-**Service worker not updating**
-
-- With `registerType: "autoUpdate"`, updates are fetched in the background. You can also close/reopen the app to activate.
-
-**TypeScript type error for PWA client (if you add TS)**
-
-- Add to `tsconfig.json`: `"types": ["vite-plugin-pwa/client"]`.
-
----
-
-## Contributing
-
-1. Fork the repo
-2. Create a feature branch: `git checkout -b feat/my-feature`
-3. Commit changes: `git commit -m "feat: add my feature"`
-4. Push branch: `git push origin feat/my-feature`
-5. Open a Pull Request
-
-Use conventional commits where possible.
-
----
-
-## License
-
-Choose a license for your project (e.g., MIT). Create a `LICENSE` file in the repo root.
+MIT — see [LICENSE](./LICENSE).
 
 ---
 
