@@ -5,7 +5,7 @@ import { BrainIcon, ChartLineUpIcon, ClockIcon } from "@phosphor-icons/react";
 import Footer from "@/components/Footer";
 import MainNav from "@/components/MainNav";
 import grid9x9 from "@/assets/9x9.svg";
-import legoPlay from "@/assets/lego-playing-sudoku.png";
+import legoPlay from "@/assets/lego-playing-sudoku.webp";
 
 export default function Landing() {
   useEffect(() => {
