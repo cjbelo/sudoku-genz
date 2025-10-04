@@ -108,6 +108,7 @@ const GameScreen = () => {
                 className={[
                   "aspect-[3/4] rounded-lg pointer-fine:hover:bg-purple-200 transition flex flex-col items-center justify-center relative",
                   left === 0 ? "bg-gray-200 pointer-events-none" : "bg-purple-100 cursor-pointer",
+                  isPaused ? "opacity-20 pointer-events-none" : "",
                 ].join(" ")}
                 onClick={() => setCell(selected?.row, selected?.col, digit)}
               >
