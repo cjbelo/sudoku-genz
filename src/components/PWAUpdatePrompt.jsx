@@ -58,15 +58,15 @@ export default function PWAUpdatePrompt() {
               <div className="mt-3 flex gap-2">
                 <button
                   onClick={reload}
-                  className="inline-flex items-center justify-center rounded-lg bg-white px-3 py-1.5
-                             text-sm font-semibold text-gray-900 pointer-fine:hover:bg-gray-100 transition"
+                  className="inline-flex items-center justify-center rounded-lg bg-white px-4 py-2 cursor-pointer
+                             text-sm font-semibold text-gray-900 pointer-fine:hover:-translate-y-1 transition"
                 >
                   Reload
                 </button>
                 <button
                   onClick={close}
-                  className="inline-flex items-center justify-center rounded-lg bg-gray-800 px-3 py-1.5
-                             text-sm font-semibold text-white/90 pointer-fine:hover:bg-gray-700 transition"
+                  className="inline-flex items-center justify-center rounded-lg bg-gray-900 px-4 py-2 cursor-pointer
+                             text-sm font-semibold text-white/90 pointer-fine:hover:-translate-y-1 transition"
                 >
                   Later
                 </button>
