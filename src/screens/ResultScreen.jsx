@@ -1,6 +1,7 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import AOS from "aos";
-import { LightningIcon, PlayIcon, ShareNetworkIcon } from "@phosphor-icons/react";
+import * as htmlToImage from "html-to-image";
+import { DownloadIcon, LightningIcon, PlayIcon } from "@phosphor-icons/react";
 import { useAppStore } from "@/stores/appStore";
 import ActionButton from "@/components/ActionButton";
 
@@ -11,9 +12,56 @@ const formatTime = (seconds) => {
 };
 const msToStr = (ms) => (ms == null ? "—" : formatTime(Math.floor(ms / 1000)));
 
-const ResultScreen = () => {
+export default function ResultScreen() {
   const { setScreen, difficulty, elapsedMs, mistakes, getStatsSummary } = useAppStore();
   const elapsed = Math.floor(elapsedMs / 1000);
+
+  const cardRef = useRef(null);
+
+  const triggerDownload = (blob, filename) => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  };
+
+  const captureCardPng = async () => {
+    if (!cardRef.current) throw new Error("Card not found");
+
+    const footer = document.createElement("div");
+    footer.className = "text-[10px] text-gray-400 mt-2 pt-2 border-t border-gray-100 select-none";
+    footer.innerHTML = `Sudoku Gen Z • ${window.location.origin}`;
+    cardRef.current.appendChild(footer);
+
+    const dataUrl = await htmlToImage.toPng(cardRef.current, {
+      cacheBust: true,
+      pixelRatio: Math.min(window.devicePixelRatio || 1, 2),
+      backgroundColor: "#ffffff",
+      filter: (node) =>
+        !(node instanceof HTMLElement && (node.id === "confetti-container" || node.dataset?.noShare === "true")),
+    });
+
+    footer.remove();
+
+    const res = await fetch(dataUrl);
+    const blob = await res.blob();
+    const file = new File([blob], `sudoku-genz-result-${Date.now()}.png`, { type: "image/png" });
+    return { blob, file };
+  };
+
+  const handleDownloadResult = async () => {
+    try {
+      const { blob, file } = await captureCardPng();
+      triggerDownload(blob, file.name);
+    } catch (e) {
+      console.error(e);
+      alert("Sorry, failed to generate the image. Try again.");
+    }
+  };
 
   const createConfetti = () => {
     const colors = ["#FF5252", "#FFD740", "#64FFDA", "#448AFF", "#B388FF"];
@@ -62,6 +110,8 @@ const ResultScreen = () => {
       <div id="confetti-container" className="fixed inset-0 overflow-hidden pointer-events-none z-0"></div>
       <div className="w-full max-w-md text-center z-10">
         <div
+          ref={cardRef}
+          id="share-card"
           className="bg-white rounded-2xl shadow-xl overflow-hidden transform transition-all duration-500 pointer-fine:hover:shadow-2xl"
           data-aos="zoom-in"
         >
@@ -94,21 +144,6 @@ const ResultScreen = () => {
                   {difficulty}
                 </div>
               </div>
-            </div>
-
-            <div className="flex space-x-3 mb-6">
-              <ActionButton
-                Icon={PlayIcon}
-                label="Play Again"
-                className="font-semibold border border-gray-300 pointer-fine:hover:bg-gray-100"
-                onClick={handlePlayAgain}
-              />
-              <ActionButton
-                Icon={ShareNetworkIcon}
-                label="Share"
-                className="font-semibold bg-purple-500 text-white pointer-fine:hover:bg-purple-600"
-                onClick={handlePlayAgain}
-              />
             </div>
 
             <div>
@@ -163,9 +198,22 @@ const ResultScreen = () => {
             </div>
           </div>
         </div>
+
+        <div className="flex space-x-3 mt-4">
+          <ActionButton
+            Icon={PlayIcon}
+            label="Play Again"
+            className="bg-white font-semibold border border-gray-300 pointer-fine:hover:-translate-y-1 active:scale-98"
+            onClick={handlePlayAgain}
+          />
+          <ActionButton
+            Icon={DownloadIcon}
+            label="Save Result"
+            className="font-semibold text-white bg-purple-500 pointer-fine:hover:bg-purple-600"
+            onClick={handleDownloadResult}
+          />
+        </div>
       </div>
     </>
   );
-};
-
-export default ResultScreen;
+}

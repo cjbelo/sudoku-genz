@@ -10,7 +10,7 @@ export const generatePuzzleBoard = (solvedBoard, difficulty = "easy", minAvailab
   const puzzle = solvedBoard.map((row) => [...row]);
 
   // target "holes" by difficulty
-  const holesByDifficulty = { easy: 30, medium: 40, hard: 50, expert: 60 };
+  const holesByDifficulty = { easy: 3, medium: 40, hard: 50, expert: 60 };
   const holesTarget = holesByDifficulty[difficulty] ?? holesByDifficulty.expert;
 
   // ensure we don't demand more than we can remove per digit
