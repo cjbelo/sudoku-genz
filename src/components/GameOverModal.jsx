@@ -1,3 +1,4 @@
+import { ArrowClockwiseIcon, SquaresFourIcon } from "@phosphor-icons/react";
 import { useAppStore } from "@/stores/appStore";
 import ActionButton from "./ActionButton";
 
@@ -19,14 +20,14 @@ const GameOverModal = () => {
           <div class="flex flex-col space-y-4">
             <ActionButton
               label="Restart"
-              icon="refresh-cw"
-              className="bg-purple-600 pointer-fine:hover:bg-purple-700 text-white"
+              Icon={ArrowClockwiseIcon}
+              className="bg-purple-600 pointer-fine:hover:-translate-y-1 text-white active:scale-98"
               onClick={restartSameDifficulty}
             />
             <ActionButton
               label="Select Difficulty"
-              icon="chevron-down"
-              className="bg-gray-200 pointer-fine:hover:bg-gray-300"
+              Icon={SquaresFourIcon}
+              className="bg-gray-200 pointer-fine:hover:-translate-y-1 active:scale-98"
               onClick={() => setScreen("difficulty")}
             />
           </div>

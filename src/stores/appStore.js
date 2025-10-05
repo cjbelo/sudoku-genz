@@ -54,6 +54,7 @@ export const useAppStore = create(
       elapsedMs: 0, // accumulated ms
       isGameRunning: false,
       isPaused: false,
+      isResetGame: false,
 
       // --- Counters & state ---
       mistakeLimit: 3,
@@ -76,8 +77,13 @@ export const useAppStore = create(
         });
       },
 
+      isGuest: () => get().currentUser === "guest",
+
       setIsLogout: () => set({ isLogout: true }),
       clearIsLogout: () => set({ isLogout: false }),
+
+      setIsResetGame: () => set({ isResetGame: true }),
+      clearIsResetGame: () => set({ isResetGame: false }),
 
       logout: () =>
         set({
@@ -433,6 +439,7 @@ export const useAppStore = create(
     {
       name: "sudoku-genz",
       storage: createJSONStorage(() => localStorage),
+      version: 1,
       onRehydrateStorage: () => (state) => {
         if (state?.players?.guest) {
           delete state.players.guest;

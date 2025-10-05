@@ -15,6 +15,7 @@ import {
   PlayIcon,
   SignOutIcon,
 } from "@phosphor-icons/react";
+import ResetGameModal from "@/components/ResetGameModal";
 
 const GameScreen = () => {
   const {
@@ -29,6 +30,7 @@ const GameScreen = () => {
     selected,
     setIsLogout,
     setCell,
+    setIsResetGame,
     setScreen,
     setSelectedCell,
     useHint,
@@ -205,7 +207,7 @@ const GameScreen = () => {
           Sudoku <span className="text-purple-600">Gen Z</span>
         </h1>
         <div className="flex space-x-2">
-          <button className="p-2 rounded-full bg-white shadow cursor-pointer" onClick={() => setScreen("difficulty")}>
+          <button className="p-2 rounded-full bg-white shadow cursor-pointer" onClick={setIsResetGame}>
             <ArrowClockwiseIcon size={22} />
           </button>
           <button className="p-2 rounded-full bg-white shadow cursor-pointer" onClick={setIsLogout}>
@@ -289,6 +291,7 @@ const GameScreen = () => {
         <div className="flex space-x-4 w-full max-w-md"></div>
       </div>
       <GameOverModal />
+      <ResetGameModal />
     </>
   );
 };

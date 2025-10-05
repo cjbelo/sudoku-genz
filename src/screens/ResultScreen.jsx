@@ -1,8 +1,8 @@
 import { useEffect, useMemo } from "react";
 import AOS from "aos";
+import { LightningIcon, PlayIcon, ShareNetworkIcon } from "@phosphor-icons/react";
 import { useAppStore } from "@/stores/appStore";
 import ActionButton from "@/components/ActionButton";
-import { LightningIcon } from "@phosphor-icons/react";
 
 const formatTime = (seconds) => {
   const m = Math.floor(seconds / 60);
@@ -98,13 +98,13 @@ const ResultScreen = () => {
 
             <div className="flex space-x-3 mb-6">
               <ActionButton
-                icon="play"
+                Icon={PlayIcon}
                 label="Play Again"
                 className="font-semibold border border-gray-300 pointer-fine:hover:bg-gray-100"
                 onClick={handlePlayAgain}
               />
               <ActionButton
-                icon="share-2"
+                Icon={ShareNetworkIcon}
                 label="Share"
                 className="font-semibold bg-purple-500 text-white pointer-fine:hover:bg-purple-600"
                 onClick={handlePlayAgain}

@@ -1,3 +1,4 @@
+import { SignOutIcon, XIcon } from "@phosphor-icons/react";
 import { useAppStore } from "@/stores/appStore";
 import ActionButton from "./ActionButton";
 
@@ -17,13 +18,13 @@ const LogoutModal = () => {
           <div className="flex flex-col space-y-4">
             <ActionButton
               label="Yes, Logout"
-              icon="log-out"
+              Icon={SignOutIcon}
               className="bg-red-500 pointer-fine:hover:-translate-y-1 text-white active:scale-98"
               onClick={logout}
             />
             <ActionButton
               label="Cancel"
-              icon="x"
+              Icon={XIcon}
               className="bg-gray-300 pointer-fine:hover:-translate-y-1 active:scale-98"
               onClick={clearIsLogout}
             />
