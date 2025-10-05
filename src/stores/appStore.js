@@ -12,6 +12,26 @@ const toUserId = (name) => {
   return id === "guest" ? "guest" : id;
 };
 
+const bitOf = (d) => 1 << (d - 1); // 1..9 -> bit
+const hasBit = (mask, d) => (mask & bitOf(d)) !== 0;
+
+// iterate peers (row/col/box)
+const forEachPeer = (r, c, fn) => {
+  // row
+  for (let cc = 0; cc < 9; cc++) if (cc !== c) fn(r, cc);
+  // col
+  for (let rr = 0; rr < 9; rr++) if (rr !== r) fn(rr, c);
+  // box
+  const br = Math.floor(r / 3) * 3,
+    bc = Math.floor(c / 3) * 3;
+  for (let rr = br; rr < br + 3; rr++) {
+    for (let cc = bc; cc < bc + 3; cc++) {
+      if (rr === r && cc === c) continue;
+      fn(rr, cc);
+    }
+  }
+};
+
 const DIFFS = ["easy", "medium", "hard", "expert"];
 const emptyDiffStats = () => ({
   gamesPlayed: 0,
@@ -66,6 +86,9 @@ export const useAppStore = create(
       players: {},
       currentGame: null,
 
+      isFillNotes: false,
+      notes: Array(81).fill(0), // per-cell bitmask, 1..9 bits
+
       // --- Auth ---
       login: (username) => {
         const id = toUserId(username);
@@ -84,6 +107,9 @@ export const useAppStore = create(
 
       setIsResetGame: () => set({ isResetGame: true }),
       clearIsResetGame: () => set({ isResetGame: false }),
+
+      setIsFillNotes: () => set({ isFillNotes: true }),
+      clearIsFillNotes: () => set({ isFillNotes: false }),
 
       logout: () =>
         set({
@@ -140,6 +166,57 @@ export const useAppStore = create(
 
           currentGame: { difficulty, startedAtMs, committed: false },
         });
+      },
+
+      getCellNotesMask: (row, col) => {
+        const m = get().notes[idx(row, col)];
+        return m || 0;
+      },
+
+      getCellNotesList: (row, col) => {
+        const m = get().notes[idx(row, col)] || 0;
+        const out = [];
+        for (let d = 1; d <= 9; d++) if (hasBit(m, d)) out.push(d);
+        return out;
+      },
+
+      setCellNotesMask: (row, col, mask) => {
+        const notes = [...get().notes];
+        notes[idx(row, col)] = mask >>> 0;
+        set({ notes });
+      },
+
+      clearCellNotes: (row, col) => {
+        const notes = [...get().notes];
+        notes[idx(row, col)] = 0;
+        set({ notes });
+      },
+
+      toggleNote: (row, col, digit) => {
+        const { puzzleStr, currentStr } = get();
+        if (!puzzleStr || !currentStr) return;
+
+        // lock clues and non-empty actual values
+        if (getCellStr(puzzleStr, row, col) !== 0) return;
+        if (getCellStr(currentStr, row, col) !== 0) return;
+
+        const i = idx(row, col);
+        const notes = [...get().notes];
+        const mask = notes[i] || 0;
+        const bit = bitOf(digit);
+        notes[i] = mask & bit ? mask & ~bit : mask | bit;
+        set({ notes });
+      },
+
+      clearDigitFromPeersNotes: (row, col, digit) => {
+        const notes = [...get().notes];
+        forEachPeer(row, col, (rr, cc) => {
+          const k = idx(rr, cc);
+          if (notes[k]) {
+            notes[k] = notes[k] & ~bitOf(digit);
+          }
+        });
+        set({ notes });
       },
 
       // ---- Finalize a WIN (called when solved) ----
@@ -289,6 +366,24 @@ export const useAppStore = create(
         get().checkSolved();
       },
 
+      computeCandidates: (row, col) => {
+        const { getCurrentBoard } = get();
+        const b = getCurrentBoard();
+        if (!b) return 0;
+        if (b[row][col] !== 0) return 0;
+        const used = new Set();
+
+        for (let cc = 0; cc < 9; cc++) used.add(b[row][cc]);
+        for (let rr = 0; rr < 9; rr++) used.add(b[rr][col]);
+        const br = Math.floor(row / 3) * 3,
+          bc = Math.floor(col / 3) * 3;
+        for (let rr = br; rr < br + 3; rr++) for (let cc = bc; cc < bc + 3; cc++) used.add(b[rr][cc]);
+
+        let mask = 0;
+        for (let d = 1; d <= 9; d++) if (!used.has(d)) mask |= bitOf(d);
+        return mask;
+      },
+
       setCell: (row, col, val /* 0-9 */) => {
         const {
           puzzleStr,
@@ -328,6 +423,12 @@ export const useAppStore = create(
             gameOverReason: over ? "mistakes" : null,
             isGameRunning: over ? false : get().isGameRunning,
           });
+
+          // clear notes for this cell and peers
+          get().clearCellNotes(row, col);
+          if (val >= 1 && val <= 9) {
+            get().clearDigitFromPeersNotes(row, col, val);
+          }
 
           if (over) {
             get().finalizeLoss();

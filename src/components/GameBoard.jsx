@@ -1,7 +1,16 @@
 import { useAppStore } from "@/stores/appStore";
 
 const GameBoard = () => {
-  const { getCurrentBoard, getPuzzleBoard, selected, invalidIdxs, isPaused, setSelectedCell } = useAppStore();
+  const {
+    isFillNotes,
+    getCellNotesList,
+    getCurrentBoard,
+    getPuzzleBoard,
+    selected,
+    invalidIdxs,
+    isPaused,
+    setSelectedCell,
+  } = useAppStore();
 
   const current = getCurrentBoard();
   const puzzle = getPuzzleBoard();
@@ -63,7 +72,30 @@ const GameBoard = () => {
                       isInvalid ? "invalid" : ""
                     }`}
                   >
-                    {!isPaused && digit ? digit : ""}
+                    {!isPaused ? (
+                      digit ? (
+                        <span className={[isFillNotes ? "opacity-40" : ""].join(" ")}>{digit}</span>
+                      ) : (
+                        <div className="absolute inset-1 grid grid-cols-3 grid-rows-3">
+                          {(() => {
+                            const notes = getCellNotesList(row, col); // e.g., [1,3,7]
+                            // Render 1..9 positions, but show number only if it's in notes
+                            return Array.from({ length: 9 }).map((_, noteIdx) => {
+                              const n = noteIdx + 1;
+                              const show = notes.includes(n);
+                              return (
+                                <div
+                                  key={noteIdx}
+                                  className="text-[0.55rem] text-gray-600 flex items-center justify-center select-none"
+                                >
+                                  {show ? n : ""}
+                                </div>
+                              );
+                            });
+                          })()}
+                        </div>
+                      )
+                    ) : null}
                   </div>
                 );
               })

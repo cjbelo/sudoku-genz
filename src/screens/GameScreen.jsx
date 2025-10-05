@@ -14,14 +14,18 @@ import {
   PencilIcon,
   PlayIcon,
   SignOutIcon,
+  XIcon,
 } from "@phosphor-icons/react";
 import ResetGameModal from "@/components/ResetGameModal";
 
 const GameScreen = () => {
   const {
+    clearCellNotes,
+    clearIsFillNotes,
     getCurrentBoard,
     getPuzzleBoard,
     hints,
+    isFillNotes,
     isGameOver,
     isPaused,
     invalidIdxs,
@@ -30,9 +34,11 @@ const GameScreen = () => {
     selected,
     setIsLogout,
     setCell,
+    setIsFillNotes,
     setIsResetGame,
     setScreen,
     setSelectedCell,
+    toggleNote,
     useHint,
   } = useAppStore();
 
@@ -158,7 +164,12 @@ const GameScreen = () => {
       // Numbers 1-9
       if (/^[1-9]$/.test(e.key)) {
         const digit = Number(e.key);
-        setCell(sel.row, sel.col, digit);
+        if (isFillNotes) {
+          e.preventDefault();
+          setNote(sel.row, sel.col, digit);
+        } else {
+          setCell(sel.row, sel.col, digit);
+        }
         return;
       }
     };
@@ -188,6 +199,16 @@ const GameScreen = () => {
   const handlePauseToggle = () => {
     if (isPaused) resumeGame();
     else pauseGame();
+  };
+
+  const handleFillNotesToggle = () => {
+    if (isFillNotes) clearIsFillNotes();
+    else setIsFillNotes();
+  };
+
+  const setNote = (row, col, digit) => {
+    if (row == null || col == null || digit == null) return;
+    toggleNote(row, col, digit);
   };
 
   if (!current || !puzzle) return null;
@@ -233,21 +254,26 @@ const GameScreen = () => {
                   left === 0 ? "bg-gray-200 pointer-events-none" : "bg-purple-100 cursor-pointer",
                   isPaused ? "opacity-20 pointer-events-none" : "",
                 ].join(" ")}
-                onClick={() => setCell(selected?.row, selected?.col, digit)}
+                onClick={() => {
+                  if (!selected || isPaused) return;
+                  isFillNotes ? setNote(selected.row, selected.col, digit) : setCell(selected.row, selected.col, digit);
+                }}
               >
                 <span
                   className={["font-bold text-xl mt-1", left === 0 ? "text-gray-500" : "text-purple-800"].join(" ")}
                 >
                   {digit}
                 </span>
-                <span
-                  className={[
-                    "text-xs leading-none absolute z-1 top-[5px] right-[5px]",
-                    left === 0 ? "text-gray-500" : "text-purple-400",
-                  ].join(" ")}
-                >
-                  {left}
-                </span>
+                {!isFillNotes && (
+                  <span
+                    className={[
+                      "text-xs leading-none absolute z-1 top-[5px] right-[5px]",
+                      left === 0 ? "text-gray-500" : "text-purple-400",
+                    ].join(" ")}
+                  >
+                    {left}
+                  </span>
+                )}
               </button>
             );
           })}
@@ -255,15 +281,23 @@ const GameScreen = () => {
 
         <div className="grid grid-cols-2 gap-3 w-full max-w-md mb-4">
           <ActionButton
-            Icon={PencilIcon}
-            label="Fill Notes"
+            Icon={isFillNotes ? XIcon : PencilIcon}
+            label={isFillNotes ? "Close Notes" : "Fill Notes"}
             className="bg-gray-200 pointer-fine:hover:-translate-y-1 active:scale-98"
+            onClick={handleFillNotesToggle}
           />
           <ActionButton
             Icon={EraserIcon}
             label="Erase"
             className="bg-gray-200 pointer-fine:hover:-translate-y-1 active:scale-98"
-            onClick={() => !isPaused && setCell(selected?.row, selected?.col, 0)}
+            onClick={() => {
+              if (isPaused) return;
+              if (isFillNotes) {
+                if (selected) clearCellNotes(selected.row, selected.col);
+              } else {
+                setCell(selected?.row, selected?.col, 0);
+              }
+            }}
           />
           <ActionButton
             Icon={InfoIcon}
