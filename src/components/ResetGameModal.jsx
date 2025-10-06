@@ -1,23 +1,24 @@
 import { ArrowClockwiseIcon, SquaresFourIcon, XIcon } from "@phosphor-icons/react";
-import { useAppStore } from "@/stores/appStore";
+import { useAppStore } from "@/stores";
 import ActionButton from "./ActionButton";
 
 export default function ResetGameModal() {
-  const { clearIsResetGame, finalizeLoss, isGuest, isResetGame, restartSameDifficulty, setScreen } = useAppStore();
+  const { toggleResetGameModal, finalizeLoss, isGuest, isResetGameModalOpen, restartSameDifficulty, setScreen } =
+    useAppStore();
 
   const handleYes = () => {
     restartSameDifficulty();
     finalizeLoss();
-    clearIsResetGame();
+    toggleResetGameModal();
   };
 
   const handleSelectDifficulty = () => {
     setScreen("difficulty");
     finalizeLoss();
-    clearIsResetGame();
+    toggleResetGameModal();
   };
 
-  if (!isResetGame) return null;
+  if (!isResetGameModalOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
@@ -46,7 +47,7 @@ export default function ResetGameModal() {
               label="Cancel"
               Icon={XIcon}
               className="bg-gray-300 pointer-fine:hover:-translate-y-1 active:scale-98"
-              onClick={clearIsResetGame}
+              onClick={toggleResetGameModal}
             />
           </div>
         </div>

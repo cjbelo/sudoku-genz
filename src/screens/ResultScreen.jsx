@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef } from "react";
 import AOS from "aos";
 import * as htmlToImage from "html-to-image";
 import { DownloadIcon, LightningIcon, PlayIcon } from "@phosphor-icons/react";
-import { useAppStore } from "@/stores/appStore";
+import { useAppStore } from "@/stores";
 import ActionButton from "@/components/ActionButton";
 
 const formatTime = (seconds) => {

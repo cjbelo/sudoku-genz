@@ -1,7 +1,7 @@
 import { useMemo, useCallback, useEffect } from "react";
 import ActionButton from "@/components/ActionButton";
 import GameBoard from "@/components/GameBoard";
-import { useAppStore } from "@/stores/appStore";
+import { useAppStore } from "@/stores";
 import Counters from "@/components/Counters";
 import GameOverModal from "@/components/GameOverModal";
 import {
@@ -21,7 +21,6 @@ import ResetGameModal from "@/components/ResetGameModal";
 const GameScreen = () => {
   const {
     clearCellNotes,
-    clearIsFillNotes,
     getCurrentBoard,
     getPuzzleBoard,
     hints,
@@ -32,13 +31,13 @@ const GameScreen = () => {
     pauseGame,
     resumeGame,
     selected,
-    setIsLogout,
     setCell,
-    setIsFillNotes,
-    setIsResetGame,
+    toggleResetGameModal,
     setScreen,
     setSelectedCell,
     toggleNote,
+    toggleIsFillNotes,
+    toggleLogoutModal,
     useHint,
   } = useAppStore();
 
@@ -201,11 +200,6 @@ const GameScreen = () => {
     else pauseGame();
   };
 
-  const handleFillNotesToggle = () => {
-    if (isFillNotes) clearIsFillNotes();
-    else setIsFillNotes();
-  };
-
   const setNote = (row, col, digit) => {
     if (row == null || col == null || digit == null) return;
     toggleNote(row, col, digit);
@@ -228,10 +222,10 @@ const GameScreen = () => {
           Sudoku <span className="text-purple-600">Gen Z</span>
         </h1>
         <div className="flex space-x-2">
-          <button className="p-2 rounded-full bg-white shadow cursor-pointer" onClick={setIsResetGame}>
+          <button className="p-2 rounded-full bg-white shadow cursor-pointer" onClick={toggleResetGameModal}>
             <ArrowClockwiseIcon size={22} />
           </button>
-          <button className="p-2 rounded-full bg-white shadow cursor-pointer" onClick={setIsLogout}>
+          <button className="p-2 rounded-full bg-white shadow cursor-pointer" onClick={toggleLogoutModal}>
             <SignOutIcon size={22} />
           </button>
         </div>
@@ -284,7 +278,7 @@ const GameScreen = () => {
             Icon={isFillNotes ? XIcon : PencilIcon}
             label={isFillNotes ? "Close Notes" : "Fill Notes"}
             className="bg-gray-200 pointer-fine:hover:-translate-y-1 active:scale-98"
-            onClick={handleFillNotesToggle}
+            onClick={toggleIsFillNotes}
           />
           <ActionButton
             Icon={EraserIcon}

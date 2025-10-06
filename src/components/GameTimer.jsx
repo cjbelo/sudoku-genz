@@ -1,4 +1,4 @@
-import { useAppStore } from "@/stores/appStore";
+import { useAppStore } from "@/stores";
 import { useEffect, useState } from "react";
 
 const GameTimer = () => {

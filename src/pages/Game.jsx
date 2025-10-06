@@ -1,4 +1,4 @@
-import { useAppStore } from "@/stores/appStore";
+import { useAppStore } from "@/stores";
 import DifficultyScreen from "@/screens/DifficultyScreen";
 import GameScreen from "@/screens/GameScreen";
 import LoginScreen from "@/screens/LoginScreen";

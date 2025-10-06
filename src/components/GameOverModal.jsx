@@ -1,5 +1,5 @@
 import { ArrowClockwiseIcon, SquaresFourIcon } from "@phosphor-icons/react";
-import { useAppStore } from "@/stores/appStore";
+import { useAppStore } from "@/stores";
 import ActionButton from "./ActionButton";
 
 const GameOverModal = () => {

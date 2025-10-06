@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAppStore } from "@/stores/appStore";
+import { useAppStore } from "@/stores";
 import { SignInIcon, UserIcon, XIcon } from "@phosphor-icons/react";
 import { Link } from "react-router-dom";
 

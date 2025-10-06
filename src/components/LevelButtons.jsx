@@ -1,4 +1,4 @@
-import { useAppStore } from "@/stores/appStore";
+import { useAppStore } from "@/stores";
 
 const levels = [
   { level: "easy", desc: "Perfect for beginners", emoji: "😊", color: "text-green-600" },

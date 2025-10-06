@@ -1,14 +1,14 @@
-import { useAppStore } from "@/stores/appStore";
+import { useAppStore } from "@/stores";
 import LevelButtons from "@/components/LevelButtons";
 import { SignOutIcon } from "@phosphor-icons/react";
 
 const DifficultyScreen = () => {
-  const { currentUserDisplay, setIsLogout } = useAppStore();
+  const { currentUserDisplay, toggleLogoutModal } = useAppStore();
   return (
     <>
       <header className="flex justify-end items-center gap-3 w-full mb-4">
         <span className="text-purple-800">Hello, {currentUserDisplay}</span>
-        <button className="p-2 rounded-full bg-white shadow cursor-pointer" onClick={setIsLogout}>
+        <button className="p-2 rounded-full bg-white shadow cursor-pointer" onClick={toggleLogoutModal}>
           <SignOutIcon size={22} />
         </button>
       </header>

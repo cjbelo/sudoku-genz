@@ -1,8 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { boardToStr, strToBoard, setCellStr, getCellStr } from "@/utils/sudokuCodec";
-import { generateSolvedBoard } from "@/utils/generateSolvedBoard";
-import { generatePuzzleBoard } from "@/utils/generatePuzzleBoard";
+import { generateSolvedBoard, generatePuzzleBoard } from "@/utils/generators";
 
 const idx = (r, c) => r * 9 + c;
 const boxRC = (r, c) => ({ boxRow: Math.floor(r / 3), boxCol: Math.floor(c / 3) });
@@ -90,457 +89,455 @@ export const useAppStore = create(
       notes: Array(81).fill(0), // per-cell bitmask, 1..9 bits
 
       // --- Auth ---
-      login: (username) => {
-        const id = toUserId(username);
-        const display = (username ?? "").trim();
-        set({
-          currentUser: id,
-          currentUserDisplay: display,
-          screen: "difficulty",
-        });
-      },
+      // login: (username) => {
+      //   const id = toUserId(username);
+      //   const display = (username ?? "").trim();
+      //   set({
+      //     currentUser: id,
+      //     currentUserDisplay: display,
+      //     screen: "difficulty",
+      //   });
+      // },
 
-      isGuest: () => get().currentUser === "guest",
+      // isGuest: () => get().currentUser === "guest",
 
-      setIsLogout: () => set({ isLogout: true }),
-      clearIsLogout: () => set({ isLogout: false }),
+      // setIsLogout: () => set({ isLogout: true }),
+      // clearIsLogout: () => set({ isLogout: false }),
 
-      setIsResetGame: () => set({ isResetGame: true }),
-      clearIsResetGame: () => set({ isResetGame: false }),
+      // setIsResetGame: () => set({ isResetGame: true }),
+      // clearIsResetGame: () => set({ isResetGame: false }),
 
-      setIsFillNotes: () => set({ isFillNotes: true }),
-      clearIsFillNotes: () => set({ isFillNotes: false }),
+      // setIsFillNotes: () => set({ isFillNotes: true }),
+      // clearIsFillNotes: () => set({ isFillNotes: false }),
 
-      logout: () =>
-        set({
-          currentUser: null,
-          currentUserDisplay: null,
-          screen: "login",
-          stats: {},
-          startTime: null,
-          elapsedMs: 0,
-          invalidIdxs: [],
-          isGameRunning: false,
-          isPaused: false,
-          solvedStr: null,
-          puzzleStr: null,
-          currentStr: null,
-          selected: null,
-          invalidIdxs: [],
-          mistakes: 0,
-          hints: 3,
-          isGameOver: false,
-          gameOverReason: null,
-          isLogout: false,
-        }),
+      // logout: () =>
+      //   set({
+      //     currentUser: null,
+      //     currentUserDisplay: null,
+      //     screen: "login",
+      //     stats: {},
+      //     startTime: null,
+      //     elapsedMs: 0,
+      //     invalidIdxs: [],
+      //     isGameRunning: false,
+      //     isPaused: false,
+      //     solvedStr: null,
+      //     puzzleStr: null,
+      //     currentStr: null,
+      //     selected: null,
+      //     mistakes: 0,
+      //     hints: 3,
+      //     isGameOver: false,
+      //     gameOverReason: null,
+      //     isLogout: false,
+      //     notes: Array(81).fill(0),
+      //   }),
 
       // --- Nav & game lifecycle ---
-      setDifficulty: (difficulty) => set({ difficulty }),
-      setScreen: (screen) => set({ screen }),
+      // setDifficulty: (difficulty) => set({ difficulty }),
+      // setScreen: (screen) => set({ screen }),
 
-      setGameStart: (difficulty) => {
-        const solved = generateSolvedBoard();
-        const puzzle = generatePuzzleBoard(solved, difficulty);
-        const solvedStr = boardToStr(solved);
-        const puzzleStr = boardToStr(puzzle);
-        const startedAtMs = Date.now();
+      // setGameStart: (difficulty) => {
+      //   const solved = generateSolvedBoard();
+      //   const puzzle = generatePuzzleBoard(solved, difficulty);
+      //   const solvedStr = boardToStr(solved);
+      //   const puzzleStr = boardToStr(puzzle);
+      //   const startedAtMs = Date.now();
 
-        set({
-          solvedStr,
-          puzzleStr,
-          currentStr: puzzleStr,
-          difficulty,
-          screen: "game",
-          startTime: startedAtMs,
-          elapsedMs: 0,
-          invalidIdxs: [],
-          isGameRunning: true,
-          isPaused: false,
-          selected: null,
+      //   set({
+      //     solvedStr,
+      //     puzzleStr,
+      //     currentStr: puzzleStr,
+      //     difficulty,
+      //     screen: "game",
+      //     startTime: startedAtMs,
+      //     elapsedMs: 0,
+      //     invalidIdxs: [],
+      //     isGameRunning: true,
+      //     isPaused: false,
+      //     selected: null,
 
-          // counters fresh
-          mistakes: 0,
-          hints: 3,
-          isGameOver: false,
-          gameOverReason: null,
+      //     // counters fresh
+      //     mistakes: 0,
+      //     hints: 3,
+      //     isGameOver: false,
+      //     gameOverReason: null,
 
-          currentGame: { difficulty, startedAtMs, committed: false },
-        });
-      },
+      //     currentGame: { difficulty, startedAtMs, committed: false },
+      //   });
+      // },
 
-      getCellNotesMask: (row, col) => {
-        const m = get().notes[idx(row, col)];
-        return m || 0;
-      },
+      // getCellNotesMask: (row, col) => {
+      //   const m = get().notes[idx(row, col)];
+      //   return m || 0;
+      // },
 
-      getCellNotesList: (row, col) => {
-        const m = get().notes[idx(row, col)] || 0;
-        const out = [];
-        for (let d = 1; d <= 9; d++) if (hasBit(m, d)) out.push(d);
-        return out;
-      },
+      // getCellNotesList: (row, col) => {
+      //   const m = get().notes[idx(row, col)] || 0;
+      //   const out = [];
+      //   for (let d = 1; d <= 9; d++) if (hasBit(m, d)) out.push(d);
+      //   return out;
+      // },
 
-      setCellNotesMask: (row, col, mask) => {
-        const notes = [...get().notes];
-        notes[idx(row, col)] = mask >>> 0;
-        set({ notes });
-      },
+      // setCellNotesMask: (row, col, mask) => {
+      //   const notes = [...get().notes];
+      //   notes[idx(row, col)] = mask >>> 0;
+      //   set({ notes });
+      // },
 
-      clearCellNotes: (row, col) => {
-        const notes = [...get().notes];
-        notes[idx(row, col)] = 0;
-        set({ notes });
-      },
+      // clearCellNotes: (row, col) => {
+      //   const notes = [...get().notes];
+      //   notes[idx(row, col)] = 0;
+      //   set({ notes });
+      // },
 
-      toggleNote: (row, col, digit) => {
-        const { puzzleStr, currentStr } = get();
-        if (!puzzleStr || !currentStr) return;
+      // toggleNote: (row, col, digit) => {
+      //   const { puzzleStr, currentStr } = get();
+      //   if (!puzzleStr || !currentStr) return;
 
-        // lock clues and non-empty actual values
-        if (getCellStr(puzzleStr, row, col) !== 0) return;
-        if (getCellStr(currentStr, row, col) !== 0) return;
+      //   // lock clues and non-empty actual values
+      //   if (getCellStr(puzzleStr, row, col) !== 0) return;
+      //   if (getCellStr(currentStr, row, col) !== 0) return;
 
-        const i = idx(row, col);
-        const notes = [...get().notes];
-        const mask = notes[i] || 0;
-        const bit = bitOf(digit);
-        notes[i] = mask & bit ? mask & ~bit : mask | bit;
-        set({ notes });
-      },
+      //   const i = idx(row, col);
+      //   const notes = [...get().notes];
+      //   const mask = notes[i] || 0;
+      //   const bit = bitOf(digit);
+      //   notes[i] = mask & bit ? mask & ~bit : mask | bit;
+      //   set({ notes });
+      // },
 
-      clearDigitFromPeersNotes: (row, col, digit) => {
-        const notes = [...get().notes];
-        forEachPeer(row, col, (rr, cc) => {
-          const k = idx(rr, cc);
-          if (notes[k]) {
-            notes[k] = notes[k] & ~bitOf(digit);
-          }
-        });
-        set({ notes });
-      },
+      // clearDigitFromPeersNotes: (row, col, digit) => {
+      //   const notes = [...get().notes];
+      //   forEachPeer(row, col, (rr, cc) => {
+      //     const k = idx(rr, cc);
+      //     if (notes[k]) {
+      //       notes[k] = notes[k] & ~bitOf(digit);
+      //     }
+      //   });
+      //   set({ notes });
+      // },
 
       // ---- Finalize a WIN (called when solved) ----
-      finalizeWin: (elapsedMs) => {
-        const { currentUser, players, currentGame } = get();
-        if (!currentGame || currentGame.committed) return;
+      // finalizeWin: (elapsedMs) => {
+      //   const { currentUser, players, currentGame } = get();
+      //   if (!currentGame || currentGame.committed) return;
 
-        const user = currentUser ?? "guest";
-        const diff = currentGame.difficulty;
-        const updated = { ...players };
-        ensurePlayer(updated, user);
+      //   const user = currentUser ?? "guest";
+      //   const diff = currentGame.difficulty;
+      //   const updated = { ...players };
+      //   ensurePlayer(updated, user);
 
-        const s = { ...updated[user].games[diff] };
-        s.gamesPlayed += 1;
-        s.wins += 1;
-        s.currentStreak += 1;
-        s.totalWinTimeMs += elapsedMs;
-        s.bestTimeMs = s.bestTimeMs == null ? elapsedMs : Math.min(s.bestTimeMs, elapsedMs);
-        updated[user].games[diff] = s;
+      //   const s = { ...updated[user].games[diff] };
+      //   s.gamesPlayed += 1;
+      //   s.wins += 1;
+      //   s.currentStreak += 1;
+      //   s.totalWinTimeMs += elapsedMs;
+      //   s.bestTimeMs = s.bestTimeMs == null ? elapsedMs : Math.min(s.bestTimeMs, elapsedMs);
+      //   updated[user].games[diff] = s;
 
-        set({
-          players: updated,
-          currentGame: { ...currentGame, committed: true },
-        });
-      },
+      //   set({
+      //     players: updated,
+      //     currentGame: { ...currentGame, committed: true },
+      //   });
+      // },
 
       // ---- Finalize a LOSS (mistakes or withdraw) ----
-      finalizeLoss: () => {
-        const { currentUser, players, currentGame } = get();
-        if (!currentGame || currentGame.committed) return;
+      // finalizeLoss: () => {
+      //   const { currentUser, players, currentGame } = get();
+      //   if (!currentGame || currentGame.committed) return;
 
-        const user = currentUser ?? "guest";
-        const diff = currentGame.difficulty;
-        const updated = { ...players };
-        ensurePlayer(updated, user);
+      //   const user = currentUser ?? "guest";
+      //   const diff = currentGame.difficulty;
+      //   const updated = { ...players };
+      //   ensurePlayer(updated, user);
 
-        const s = { ...updated[user].games[diff] };
-        s.gamesPlayed += 1;
-        s.losses += 1;
-        s.currentStreak = 0;
-        updated[user].games[diff] = s;
+      //   const s = { ...updated[user].games[diff] };
+      //   s.gamesPlayed += 1;
+      //   s.losses += 1;
+      //   s.currentStreak = 0;
+      //   updated[user].games[diff] = s;
 
-        set({
-          players: updated,
-          currentGame: { ...currentGame, committed: true },
-        });
-      },
+      //   set({
+      //     players: updated,
+      //     currentGame: { ...currentGame, committed: true },
+      //   });
+      // },
 
-      withdrawGame: () => {
-        const { isGameRunning, isGameOver, currentGame } = get();
-        if (currentGame && !currentGame.committed && isGameRunning && !isGameOver) {
-          get().finalizeLoss();
-        }
-      },
+      // withdrawGame: () => {
+      //   const { isGameRunning, isGameOver, currentGame } = get();
+      //   if (currentGame && !currentGame.committed && isGameRunning && !isGameOver) {
+      //     get().finalizeLoss();
+      //   }
+      // },
 
-      restartSameDifficulty: () => {
-        const { difficulty } = get();
-        get().setGameStart(difficulty);
-      },
+      // restartSameDifficulty: () => {
+      //   const { difficulty } = get();
+      //   get().setGameStart(difficulty);
+      // },
 
       // Derived getters for UI
-      getSolvedBoard: () => {
-        const { solvedStr } = get();
-        return solvedStr ? strToBoard(solvedStr) : null;
-      },
-      getPuzzleBoard: () => {
-        const { puzzleStr } = get();
-        return puzzleStr ? strToBoard(puzzleStr) : null;
-      },
-      getCurrentBoard: () => {
-        const { currentStr } = get();
-        return currentStr ? strToBoard(currentStr) : null;
-      },
-
-      setSelected: (selected) => set({ selected }),
+      // getSolvedBoard: () => {
+      //   const { solvedStr } = get();
+      //   return solvedStr ? strToBoard(solvedStr) : null;
+      // },
+      // getPuzzleBoard: () => {
+      //   const { puzzleStr } = get();
+      //   return puzzleStr ? strToBoard(puzzleStr) : null;
+      // },
+      // getCurrentBoard: () => {
+      //   const { currentStr } = get();
+      //   return currentStr ? strToBoard(currentStr) : null;
+      // },
 
       // --- Selection / Highlight ---
-      setSelectedCell: (row, col) => {
-        const { currentStr, puzzleStr } = get();
-        if (!currentStr) return set({ selected: null });
-        const digit = getCellStr(currentStr, row, col);
-        const { boxRow, boxCol } = boxRC(row, col);
-        const isClue = puzzleStr ? getCellStr(puzzleStr, row, col) !== 0 : false;
-        set({
-          selected: {
-            row,
-            col,
-            index: idx(row, col),
-            digit,
-            boxRow,
-            boxCol,
-            isClue,
-          },
-        });
-      },
+      // setSelectedCell: (row, col) => {
+      //   const { currentStr, puzzleStr } = get();
+      //   if (!currentStr) return set({ selected: null });
+      //   const digit = getCellStr(currentStr, row, col);
+      //   const { boxRow, boxCol } = boxRC(row, col);
+      //   const isClue = puzzleStr ? getCellStr(puzzleStr, row, col) !== 0 : false;
+      //   set({
+      //     selected: {
+      //       row,
+      //       col,
+      //       index: idx(row, col),
+      //       digit,
+      //       boxRow,
+      //       boxCol,
+      //       isClue,
+      //     },
+      //   });
+      // },
 
       // --- Hints ---
-      useHint: () => {
-        const { hints, solvedStr, puzzleStr, currentStr, selected } = get();
-        if (!hints || !solvedStr || !puzzleStr || !currentStr) return;
+      // useHint: () => {
+      //   const { hints, solvedStr, puzzleStr, currentStr, selected } = get();
+      //   if (!hints || !solvedStr || !puzzleStr || !currentStr) return;
 
-        // Pick target: selected editable cell that is wrong/empty; else first wrong/empty cell.
-        const pickTarget = () => {
-          const choose = (r, c) => {
-            if (getCellStr(puzzleStr, r, c) !== 0) return null; // clue - skip
-            const cur = getCellStr(currentStr, r, c);
-            const sol = getCellStr(solvedStr, r, c);
-            if (cur !== sol) return { r, c, sol };
-            return null;
-          };
+      //   // Pick target: selected editable cell that is wrong/empty; else first wrong/empty cell.
+      //   const pickTarget = () => {
+      //     const choose = (r, c) => {
+      //       if (getCellStr(puzzleStr, r, c) !== 0) return null; // clue - skip
+      //       const cur = getCellStr(currentStr, r, c);
+      //       const sol = getCellStr(solvedStr, r, c);
+      //       if (cur !== sol) return { r, c, sol };
+      //       return null;
+      //     };
 
-          if (selected) {
-            const t = choose(selected.row, selected.col);
-            if (t) return t;
-          }
-          for (let r = 0; r < 9; r++) {
-            for (let c = 0; c < 9; c++) {
-              const t = choose(r, c);
-              if (t) return t;
-            }
-          }
-          return null;
-        };
+      //     if (selected) {
+      //       const t = choose(selected.row, selected.col);
+      //       if (t) return t;
+      //     }
+      //     for (let r = 0; r < 9; r++) {
+      //       for (let c = 0; c < 9; c++) {
+      //         const t = choose(r, c);
+      //         if (t) return t;
+      //       }
+      //     }
+      //     return null;
+      //   };
 
-        const target = pickTarget();
-        if (!target) return; // nothing to hint
+      //   const target = pickTarget();
+      //   if (!target) return; // nothing to hint
 
-        const { r, c, sol } = target;
-        const i = idx(r, c);
-        const nextStr = setCellStr(currentStr, r, c, sol);
+      //   const { r, c, sol } = target;
+      //   const i = idx(r, c);
+      //   const nextStr = setCellStr(currentStr, r, c, sol);
 
-        // remove from invalid if present
-        const { invalidIdxs } = get();
-        const nextInvalid = invalidIdxs && invalidIdxs.length ? invalidIdxs.filter((k) => k !== i) : [];
+      //   // remove from invalid if present
+      //   const { invalidIdxs } = get();
+      //   const nextInvalid = invalidIdxs && invalidIdxs.length ? invalidIdxs.filter((k) => k !== i) : [];
 
-        set({
-          currentStr: nextStr,
-          invalidIdxs: nextInvalid,
-          hints: hints - 1,
-        });
+      //   set({
+      //     currentStr: nextStr,
+      //     invalidIdxs: nextInvalid,
+      //     hints: hints - 1,
+      //   });
 
-        const { selected: sel } = get();
-        if (sel && sel.row === r && sel.col === c) {
-          set({ selected: { ...sel, digit: sol } });
-        }
+      //   const { selected: sel } = get();
+      //   if (sel && sel.row === r && sel.col === c) {
+      //     set({ selected: { ...sel, digit: sol } });
+      //   }
 
-        get().checkSolved();
-      },
+      //   get().checkSolved();
+      // },
 
-      computeCandidates: (row, col) => {
-        const { getCurrentBoard } = get();
-        const b = getCurrentBoard();
-        if (!b) return 0;
-        if (b[row][col] !== 0) return 0;
-        const used = new Set();
+      // computeCandidates: (row, col) => {
+      //   const { getCurrentBoard } = get();
+      //   const b = getCurrentBoard();
+      //   if (!b) return 0;
+      //   if (b[row][col] !== 0) return 0;
+      //   const used = new Set();
 
-        for (let cc = 0; cc < 9; cc++) used.add(b[row][cc]);
-        for (let rr = 0; rr < 9; rr++) used.add(b[rr][col]);
-        const br = Math.floor(row / 3) * 3,
-          bc = Math.floor(col / 3) * 3;
-        for (let rr = br; rr < br + 3; rr++) for (let cc = bc; cc < bc + 3; cc++) used.add(b[rr][cc]);
+      //   for (let cc = 0; cc < 9; cc++) used.add(b[row][cc]);
+      //   for (let rr = 0; rr < 9; rr++) used.add(b[rr][col]);
+      //   const br = Math.floor(row / 3) * 3,
+      //     bc = Math.floor(col / 3) * 3;
+      //   for (let rr = br; rr < br + 3; rr++) for (let cc = bc; cc < bc + 3; cc++) used.add(b[rr][cc]);
 
-        let mask = 0;
-        for (let d = 1; d <= 9; d++) if (!used.has(d)) mask |= bitOf(d);
-        return mask;
-      },
+      //   let mask = 0;
+      //   for (let d = 1; d <= 9; d++) if (!used.has(d)) mask |= bitOf(d);
+      //   return mask;
+      // },
 
-      setCell: (row, col, val /* 0-9 */) => {
-        const {
-          puzzleStr,
-          currentStr,
-          solvedStr,
-          invalidIdxs = [],
-          mistakes,
-          mistakeLimit,
-          isGameOver,
-          selected,
-        } = get();
-        if (isGameOver || !currentStr || !puzzleStr || !solvedStr) return;
+      // setCell: (row, col, val /* 0-9 */) => {
+      //   const {
+      //     puzzleStr,
+      //     currentStr,
+      //     solvedStr,
+      //     invalidIdxs = [],
+      //     mistakes,
+      //     mistakeLimit,
+      //     isGameOver,
+      //     selected,
+      //   } = get();
+      //   if (isGameOver || !currentStr || !puzzleStr || !solvedStr) return;
 
-        // lock clues
-        if (getCellStr(puzzleStr, row, col) !== 0) return;
+      //   // lock clues
+      //   if (getCellStr(puzzleStr, row, col) !== 0) return;
 
-        const i = idx(row, col);
-        const solvedDigit = getCellStr(solvedStr, row, col);
-        const nextStr = setCellStr(currentStr, row, col, val);
+      //   const i = idx(row, col);
+      //   const solvedDigit = getCellStr(solvedStr, row, col);
+      //   const nextStr = setCellStr(currentStr, row, col, val);
 
-        let nextInvalid = invalidIdxs;
+      //   let nextInvalid = invalidIdxs;
 
-        if (val === 0 || val === solvedDigit) {
-          // Correct or cleared -> remove from invalid
-          if (nextInvalid.includes(i)) nextInvalid = nextInvalid.filter((k) => k !== i);
-          set({ currentStr: nextStr, invalidIdxs: nextInvalid });
-        } else {
-          // Wrong entry -> add invalid + count mistake
-          if (!nextInvalid.includes(i)) nextInvalid = [...nextInvalid, i];
-          const newMistakes = mistakes + 1;
-          const over = newMistakes >= mistakeLimit;
-          set({
-            currentStr: nextStr,
-            invalidIdxs: nextInvalid,
-            mistakes: newMistakes,
-            isGameOver: over,
-            gameOverReason: over ? "mistakes" : null,
-            isGameRunning: over ? false : get().isGameRunning,
-          });
+      //   if (val === 0 || val === solvedDigit) {
+      //     // Correct or cleared -> remove from invalid
+      //     if (nextInvalid.includes(i)) nextInvalid = nextInvalid.filter((k) => k !== i);
+      //     set({ currentStr: nextStr, invalidIdxs: nextInvalid });
+      //   } else {
+      //     // Wrong entry -> add invalid + count mistake
+      //     if (!nextInvalid.includes(i)) nextInvalid = [...nextInvalid, i];
+      //     const newMistakes = mistakes + 1;
+      //     const over = newMistakes >= mistakeLimit;
+      //     set({
+      //       currentStr: nextStr,
+      //       invalidIdxs: nextInvalid,
+      //       mistakes: newMistakes,
+      //       isGameOver: over,
+      //       gameOverReason: over ? "mistakes" : null,
+      //       isGameRunning: over ? false : get().isGameRunning,
+      //     });
 
-          // clear notes for this cell and peers
-          get().clearCellNotes(row, col);
-          if (val >= 1 && val <= 9) {
-            get().clearDigitFromPeersNotes(row, col, val);
-          }
+      //     // clear notes for this cell and peers
+      //     get().clearCellNotes(row, col);
+      //     if (val >= 1 && val <= 9) {
+      //       get().clearDigitFromPeersNotes(row, col, val);
+      //     }
 
-          if (over) {
-            get().finalizeLoss();
-          }
-        }
+      //     if (over) {
+      //       get().finalizeLoss();
+      //     }
+      //   }
 
-        // keep selected.digit in sync
-        if (selected && selected.row === row && selected.col === col) {
-          set({ selected: { ...selected, digit: val } });
-        }
+      //   // keep selected.digit in sync
+      //   if (selected && selected.row === row && selected.col === col) {
+      //     set({ selected: { ...selected, digit: val } });
+      //   }
 
-        get().checkSolved();
-      },
+      //   get().checkSolved();
+      // },
 
       // Utility to recompute all invalids at once (e.g., after load/rehydrate)
-      recomputeInvalids: () => {
-        const { currentStr, solvedStr, puzzleStr } = get();
-        if (!currentStr || !solvedStr || !puzzleStr) return set({ invalidIdxs: [] });
+      // recomputeInvalids: () => {
+      //   const { currentStr, solvedStr, puzzleStr } = get();
+      //   if (!currentStr || !solvedStr || !puzzleStr) return set({ invalidIdxs: [] });
 
-        const out = [];
-        for (let r = 0; r < 9; r++) {
-          for (let c = 0; c < 9; c++) {
-            if (getCellStr(puzzleStr, r, c) !== 0) continue; // skip clues
-            const v = getCellStr(currentStr, r, c);
-            if (v !== 0 && v !== getCellStr(solvedStr, r, c)) out.push(idx(r, c));
-          }
-        }
-        set({ invalidIdxs: out });
-      },
+      //   const out = [];
+      //   for (let r = 0; r < 9; r++) {
+      //     for (let c = 0; c < 9; c++) {
+      //       if (getCellStr(puzzleStr, r, c) !== 0) continue; // skip clues
+      //       const v = getCellStr(currentStr, r, c);
+      //       if (v !== 0 && v !== getCellStr(solvedStr, r, c)) out.push(idx(r, c));
+      //     }
+      //   }
+      //   set({ invalidIdxs: out });
+      // },
 
-      checkSolved: () => {
-        const { currentStr, solvedStr, elapsedMs, startTime } = get();
-        if (!currentStr || !solvedStr) return;
+      // checkSolved: () => {
+      //   const { currentStr, solvedStr, elapsedMs, startTime } = get();
+      //   if (!currentStr || !solvedStr) return;
 
-        if (currentStr === solvedStr) {
-          const now = Date.now();
-          const totalElapsed = elapsedMs + (now - startTime);
-          get().finalizeWin(totalElapsed);
-          set({
-            isGameRunning: false,
-            isPaused: true,
-            elapsedMs: totalElapsed,
-            screen: "result",
-          });
-        }
-      },
+      //   if (currentStr === solvedStr) {
+      //     const now = Date.now();
+      //     const totalElapsed = elapsedMs + (now - startTime);
+      //     get().finalizeWin(totalElapsed);
+      //     set({
+      //       isGameRunning: false,
+      //       isPaused: true,
+      //       elapsedMs: totalElapsed,
+      //       screen: "result",
+      //     });
+      //   }
+      // },
 
-      pauseGame: () => {
-        const { isGameRunning, isPaused, startTime, elapsedMs } = get();
-        if (!isGameRunning || isPaused || !startTime) return;
-        const now = Date.now();
-        set({
-          elapsedMs: elapsedMs + (now - startTime),
-          isPaused: true,
-        });
-      },
+      // pauseGame: () => {
+      //   const { isGameRunning, isPaused, startTime, elapsedMs } = get();
+      //   if (!isGameRunning || isPaused || !startTime) return;
+      //   const now = Date.now();
+      //   set({
+      //     elapsedMs: elapsedMs + (now - startTime),
+      //     isPaused: true,
+      //   });
+      // },
 
-      resumeGame: () => {
-        const { isGameRunning, isPaused, elapsedMs } = get();
-        if (!isGameRunning || !isPaused) return;
-        set({ startTime: Date.now() - elapsedMs, elapsedMs: 0, isPaused: false });
-      },
+      // resumeGame: () => {
+      //   const { isGameRunning, isPaused, elapsedMs } = get();
+      //   if (!isGameRunning || !isPaused) return;
+      //   set({ startTime: Date.now() - elapsedMs, elapsedMs: 0, isPaused: false });
+      // },
 
-      resetTimer: () =>
-        set({
-          startTime: null,
-          elapsedMs: 0,
-          isGameRunning: false,
-          isPaused: false,
-        }),
+      // resetTimer: () =>
+      //   set({
+      //     startTime: null,
+      //     elapsedMs: 0,
+      //     isGameRunning: false,
+      //     isPaused: false,
+      //   }),
 
-      getStatsSummary: () => {
-        const { currentUser, players } = get();
-        const user = currentUser ?? "guest";
-        const p = players[user];
-        const games = p?.games;
-        const byDiff = {};
-        let totalPlayed = 0,
-          totalWins = 0,
-          totalLosses = 0;
+      // getStatsSummary: () => {
+      //   const { currentUser, players } = get();
+      //   const user = currentUser ?? "guest";
+      //   const p = players[user];
+      //   const games = p?.games;
+      //   const byDiff = {};
+      //   let totalPlayed = 0,
+      //     totalWins = 0,
+      //     totalLosses = 0;
 
-        for (const d of DIFFS) {
-          const s = games?.[d] ?? emptyDiffStats();
-          const avgMs = s.wins > 0 ? Math.floor(s.totalWinTimeMs / s.wins) : null;
-          byDiff[d] = {
-            gamesPlayed: s.gamesPlayed,
-            wins: s.wins,
-            losses: s.losses,
-            currentStreak: s.currentStreak,
-            avgTimeMs: avgMs,
-            bestTimeMs: s.bestTimeMs,
-          };
-          totalPlayed += s.gamesPlayed;
-          totalWins += s.wins;
-          totalLosses += s.losses;
-        }
+      //   for (const d of DIFFS) {
+      //     const s = games?.[d] ?? emptyDiffStats();
+      //     const avgMs = s.wins > 0 ? Math.floor(s.totalWinTimeMs / s.wins) : null;
+      //     byDiff[d] = {
+      //       gamesPlayed: s.gamesPlayed,
+      //       wins: s.wins,
+      //       losses: s.losses,
+      //       currentStreak: s.currentStreak,
+      //       avgTimeMs: avgMs,
+      //       bestTimeMs: s.bestTimeMs,
+      //     };
+      //     totalPlayed += s.gamesPlayed;
+      //     totalWins += s.wins;
+      //     totalLosses += s.losses;
+      //   }
 
-        const winRate = totalPlayed > 0 ? (totalWins / totalPlayed) * 100 : 0;
+      //   const winRate = totalPlayed > 0 ? (totalWins / totalPlayed) * 100 : 0;
 
-        return {
-          totalPlayed,
-          totalWins,
-          totalLosses,
-          winRate, // 0..100
-          byDiff, // stats per difficulty
-        };
-      },
+      //   return {
+      //     totalPlayed,
+      //     totalWins,
+      //     totalLosses,
+      //     winRate, // 0..100
+      //     byDiff, // stats per difficulty
+      //   };
+      // },
     }),
     {
       name: "sudoku-genz",
       storage: createJSONStorage(() => localStorage),
-      version: 1,
+      version: 2,
       onRehydrateStorage: () => (state) => {
         if (state?.players?.guest) {
           delete state.players.guest;

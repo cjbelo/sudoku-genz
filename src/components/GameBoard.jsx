@@ -1,4 +1,4 @@
-import { useAppStore } from "@/stores/appStore";
+import { useAppStore } from "@/stores";
 
 const GameBoard = () => {
   const {

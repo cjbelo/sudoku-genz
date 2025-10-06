@@ -90,7 +90,7 @@ export default function Landing() {
                 </h3>
                 <p className="text-gray-600">
                   Sudoku is played on a 9x9 grid, divided into nine 3x3 subgrids called "regions". Some cells contain
-                  numbers (clues), while others are empty.
+                  numbers (given), while others are empty.
                 </p>
               </div>
 

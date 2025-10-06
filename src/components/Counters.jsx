@@ -1,4 +1,4 @@
-import { useAppStore } from "@/stores/appStore";
+import { useAppStore } from "@/stores";
 import GameTimer from "./GameTimer";
 
 const Counters = () => {
