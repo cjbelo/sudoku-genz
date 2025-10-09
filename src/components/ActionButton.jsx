@@ -5,7 +5,7 @@ const ActionButton = ({ Icon = null, label, onClick, className = "" }) => {
         "flex-1 rounded-lg py-3 shadow flex items-center justify-center gap-2 transition cursor-pointer",
         className ?? "",
       ].join(" ")}
-      onClick={onClick}
+      onClick={onClick || undefined}
     >
       {Icon && <Icon size={22} />}
       {label}

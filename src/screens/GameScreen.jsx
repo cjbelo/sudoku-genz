@@ -17,6 +17,7 @@ import {
   XIcon,
 } from "@phosphor-icons/react";
 import ResetGameModal from "@/components/ResetGameModal";
+import { useGameCloseGuards } from "@/hooks/useGameCloseGuards";
 
 const GameScreen = () => {
   const {
@@ -26,6 +27,7 @@ const GameScreen = () => {
     hints,
     isFillNotes,
     isGameOver,
+    isGameRunning,
     isPaused,
     invalidIdxs,
     pauseGame,
@@ -96,6 +98,12 @@ const GameScreen = () => {
       return true; // fall back to true
     }
   }, []);
+
+  useEffect(() => {
+    if (isPaused) resumeGame();
+  }, [isGameRunning, resumeGame]);
+
+  useGameCloseGuards(true);
 
   // --- Keyboard handler ---
   useEffect(() => {

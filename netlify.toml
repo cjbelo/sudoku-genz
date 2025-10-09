@@ -1,4 +1,35 @@
+# Netlify configuration file
+
+[build]
+  # Command to build the frontend
+  command = "npm run build"
+  # Netlify functions
+  functions = "netlify/functions"
+  publish = "dist"
+
+[dev]
+  # Command to run the Vite dev server
+  command = "npm run dev"
+  # Port for the Vite dev server
+  targetPort = 3000
+  # Main port for the Netlify dev server
+  port = 8888
+  # Explicitly tell netlify dev where the source functions are
+  functions = "netlify/functions"
+  publish = "dist"
+  autoLaunch = true
+
+# Redirect rule to proxy API requests to our functions
 [[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+  force = true
+
+# --- SPA Rewrite ---
+[[redirects]]
+  # Match everything else that didn't hit the API rule
   from = "/*"
+  # Send it to the frontend's main index file
   to = "/index.html"
   status = 200

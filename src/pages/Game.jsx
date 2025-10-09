@@ -4,9 +4,30 @@ import GameScreen from "@/screens/GameScreen";
 import LoginScreen from "@/screens/LoginScreen";
 import ResultScreen from "@/screens/ResultScreen";
 import LogoutModal from "@/components/LogoutModal";
+import { useEffect, useState } from "react";
 
 const Game = () => {
   const { screen } = useAppStore();
+  const [healthStatus, setHealthStatus] = useState("checking...");
+
+  useEffect(() => {
+    const checkHealth = async () => {
+      try {
+        const response = await fetch("/api/health");
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.text();
+        setHealthStatus(data);
+      } catch (e) {
+        setHealthStatus("unhealthy");
+        console.error("Failed to check health:", e);
+      }
+    };
+    checkHealth();
+  }, []);
+
+  console.log("health", healthStatus);
 
   let content;
   switch (screen) {

@@ -42,7 +42,7 @@ export const createGameSlice = (set, get) => ({
 
       // counters fresh
       mistakes: 0,
-      hints: get().difficulty === "easy" ? 5 : 3,
+      hints: difficulty === "easy" ? 5 : 3,
       isGameOver: false,
       gameOverReason: null,
       notes: Array(81).fill(0),

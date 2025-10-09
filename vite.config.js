@@ -30,6 +30,9 @@ export default defineConfig({
         { src: "/pwa-icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
         { src: "/pwa-icon-512-maskable.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
       ],
+      workbox: {
+        navigateFallbackDenylist: [/^\/api/],
+      },
     }),
   ],
   resolve: {

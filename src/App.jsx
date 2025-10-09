@@ -1,7 +1,7 @@
 import React, { Suspense, lazy } from "react";
 import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
 import ScrollToHashElement from "@/components/ScrollToHashElement";
-import PWAUpdatePrompt from "./components/PWAUpdatePrompt";
+import PWAUpdatePrompt from "@/components/PWAUpdatePrompt";
 
 const Landing = lazy(() => import("@/pages/Landing.jsx"));
 const Game = lazy(() => import("@/pages/Game.jsx"));
