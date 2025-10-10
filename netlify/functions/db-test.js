@@ -3,7 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 export default async () => {
   // Get your Supabase credentials from Netlify's environment variables
   const supabaseUrl = Netlify.env.get("SUPABASE_URL");
-  const supabaseKey = Netlify.env.get("SUPABASE_ANON_KEY");
+  const supabaseKey = Netlify.env.get("SUPABASE_SERVICE_KEY");
 
   // If the variables aren't set, return an error
   if (!supabaseUrl || !supabaseKey) {
